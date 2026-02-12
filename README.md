@@ -37,3 +37,12 @@ Las herramientas empleadas para el desarrollo del proyecto son:
 
 ## 📂 Estructura del Proyecto
 
+---
+
+## 👨‍💻 Autores
+
+- **Juan Carlos Tamayo Andrade**
+- **Juan Diego Andrade Cardozo**
+
+---
+
