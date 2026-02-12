@@ -41,8 +41,8 @@ Las herramientas empleadas para el desarrollo del proyecto son:
 
 ## 👨‍💻 Autores
 
-- **Juan Carlos Tamayo Andrade**
-- **Juan Diego Andrade Cardozo**
+- **Est.Juan Carlos Tamayo Andrade**
+- **Est.Juan Diego Andrade Cardozo**
 
 ---
 
