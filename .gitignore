@@ -5,4 +5,6 @@ etl-weatherstack/venv/
 venv/
 .idea/
 ./etl-open-meteo/.env
+./etl-weatherstack/.env
+etl-weatherstack/.env
 .env
