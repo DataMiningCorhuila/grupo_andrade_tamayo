@@ -7,15 +7,23 @@ from datetime import datetime
 from dotenv import load_dotenv
 import logging
 
+# Obtener el directorio base del proyecto (parent del directorio scripts)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 # Cargar variables de entorno
 load_dotenv()
 
+# Crear directorio de logs si no existe
+log_dir = os.path.join(BASE_DIR, 'logs')
+os.makedirs(log_dir, exist_ok=True)
+
 # Configurar logging
+log_file = os.path.join(log_dir, 'etl.log')
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('logs/etl.log'),
+        logging.FileHandler(log_file),
         logging.StreamHandler()
     ]
 )
@@ -98,15 +106,21 @@ if __name__ == "__main__":
         extractor = WeatherstackExtractor()
         datos = extractor.ejecutar_extraccion()
         
+        # Crear directorio de datos si no existe
+        data_dir = os.path.join(BASE_DIR, 'data')
+        os.makedirs(data_dir, exist_ok=True)
+        
         # Guardar como JSON
-        with open('data/clima_raw.json', 'w') as f:
+        json_path = os.path.join(data_dir, 'clima_raw.json')
+        with open(json_path, 'w') as f:
             json.dump(datos, f, indent=2)
-        logger.info(f"Datos guardados en data/clima_raw.json")
+        logger.info(f"Datos guardados en {json_path}")
         
         # Guardar como CSV
         df = pd.DataFrame(datos)
-        df.to_csv('data/clima.csv', index=False)
-        logger.info(f"Datos guardados en data/clima.csv")
+        csv_path = os.path.join(data_dir, 'clima.csv')
+        df.to_csv(csv_path, index=False)
+        logger.info(f"Datos guardados en {csv_path}")
         
         print("\n" + "="*50)
         print("RESUMEN DE EXTRACCIÓN")
