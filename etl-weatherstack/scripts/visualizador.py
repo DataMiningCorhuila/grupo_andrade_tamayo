@@ -2,11 +2,21 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+import logging
+import os
+
+# Configurar logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Directorio
+script_dir = os.path.dirname(os.path.abspath(__file__))
+data_dir = os.path.join(script_dir, '..', 'data')
 
 # Cargar datos
-df = pd.read_csv('data/clima.csv')
+df = pd.read_csv(os.path.join(data_dir, 'clima.csv'))
 
-# Crear figura con múltiples gráficas
+# Graficos
 fig, axes = plt.subplots(2, 2, figsize=(15, 10))
 fig.suptitle('Análisis de Clima por Ciudades', fontsize=16, fontweight='bold')
 
@@ -48,6 +58,7 @@ ax4.legend()
 ax4.grid(axis='y', alpha=0.3)
 
 plt.tight_layout()
-plt.savefig('data/clima_analysis.png', dpi=300, bbox_inches='tight')
-logger.info("✅ Gráficas guardadas en data/clima_analysis.png")
+output_path = os.path.join(data_dir, 'clima_analysis.png')
+plt.savefig(output_path, dpi=300, bbox_inches='tight')
+logger.info(f"✅ Gráficas guardadas en {output_path}")
 plt.show()

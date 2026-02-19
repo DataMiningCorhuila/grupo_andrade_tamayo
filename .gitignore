@@ -1,10 +1,15 @@
-./etl-weatherstack/env
-./etl-weatherstack/venv
-./etl-weatherstack/venv/
-etl-weatherstack/venv/
+# Entornos virtuales
+env/
 venv/
+etl-weatherstack/env/
+etl-weatherstack/venv/
+etl-open-meteo/env/
+etl-open-meteo/venv/
+
+# IDEs
 .idea/
-./etl-open-meteo/.env
-./etl-weatherstack/.env
-etl-weatherstack/.env
+
+# Variables de entorno
 .env
+etl-weatherstack/.env
+etl-open-meteo/.env

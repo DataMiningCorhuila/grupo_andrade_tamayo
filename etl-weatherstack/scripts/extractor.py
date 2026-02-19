@@ -45,14 +45,14 @@ class WeatherstackExtractor:
             data = response.json()
             
             if 'error' in data:
-                logger.error(f"❌ Error en API para {ciudad}: {data['error']['info']}")
+                logger.error(f"Error en API para {ciudad}: {data['error']['info']}")
                 return None
             
-            logger.info(f"✅ Datos extraídos para {ciudad}")
+            logger.info(f"Datos extraídos para {ciudad}")
             return data
             
         except Exception as e:
-            logger.error(f"❌ Error extrayendo datos para {ciudad}: {str(e)}")
+            logger.error(f"Error extrayendo datos para {ciudad}: {str(e)}")
             return None
     
     def procesar_respuesta(self, response_data):
@@ -101,12 +101,12 @@ if __name__ == "__main__":
         # Guardar como JSON
         with open('data/clima_raw.json', 'w') as f:
             json.dump(datos, f, indent=2)
-        logger.info(f"📁 Datos guardados en data/clima_raw.json")
+        logger.info(f"Datos guardados en data/clima_raw.json")
         
         # Guardar como CSV
         df = pd.DataFrame(datos)
         df.to_csv('data/clima.csv', index=False)
-        logger.info(f"📁 Datos guardados en data/clima.csv")
+        logger.info(f"Datos guardados en data/clima.csv")
         
         print("\n" + "="*50)
         print("RESUMEN DE EXTRACCIÓN")
