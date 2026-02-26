@@ -8,11 +8,9 @@ from PIL import Image, ImageTk
 import requests
 from io import BytesIO
 
-# Configurar logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# Límite de personajes a mostrar (cambiar según necesidad)
 LIMIT_CHARACTERS = 20
 
 class SimpsonsViewer:
@@ -26,7 +24,6 @@ class SimpsonsViewer:
         data_dir = os.path.join(script_dir, '..', 'data')
         json_file = os.path.join(data_dir, 'simpsons_characters.json')
         
-        # Cargar datos
         logger.info(f"Cargando datos desde {json_file}")
         with open(json_file, 'r', encoding='utf-8') as f:
             all_characters = json.load(f)
@@ -34,14 +31,14 @@ class SimpsonsViewer:
         # Aplicar límite
         self.total_characters = len(all_characters)
         self.characters = all_characters[:LIMIT_CHARACTERS]
-        logger.info(f"✅ Cargados {self.total_characters} personajes (mostrando {len(self.characters)})")
+        logger.info(f"Cargados {self.total_characters} personajes (mostrando {len(self.characters)})")
         
         # Configurar interfaz
         self.setup_ui()
         
     def setup_ui(self):
         # Título
-        title = tk.Label(self.root, text="🎬 The Simpsons Characters 🎬", 
+        title = tk.Label(self.root, text="The Simpsons Characters", 
                         font=("Arial", 20, "bold"), bg="#FFD90F", pady=10)
         title.pack(fill=tk.X)
         
@@ -108,7 +105,7 @@ class SimpsonsViewer:
             img_label.pack()
         except Exception as e:
             logger.warning(f"Error cargando imagen para {character['name']}: {e}")
-            placeholder = tk.Label(img_frame, text="❌\nImagen no\ndisponible", 
+            placeholder = tk.Label(img_frame, text="\nImagen no\ndisponible", 
                                   bg="#f0f0f0", width=20, height=8, 
                                   font=("Arial", 10))
             placeholder.pack()
@@ -144,5 +141,5 @@ class SimpsonsViewer:
 if __name__ == "__main__":
     root = tk.Tk()
     app = SimpsonsViewer(root)
-    logger.info("🚀 Iniciando visualizador...")
+    logger.info("Iniciando visualizador...")
     root.mainloop()

@@ -13,3 +13,7 @@ etl-open-meteo/venv/
 .env
 etl-weatherstack/.env
 etl-open-meteo/.env
+
+# Pycache
+__pycache__/
+**/__pycache__/

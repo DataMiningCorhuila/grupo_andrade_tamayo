@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+import sys
 import requests
 import json
 import pandas as pd
@@ -7,17 +8,15 @@ from datetime import datetime
 from dotenv import load_dotenv
 import logging
 
-# Obtener el directorio base del proyecto (parent del directorio scripts)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if BASE_DIR not in sys.path:
+    sys.path.insert(0, BASE_DIR)
 
-# Cargar variables de entorno
 load_dotenv()
 
-# Crear directorio de logs si no existe
 log_dir = os.path.join(BASE_DIR, 'logs')
 os.makedirs(log_dir, exist_ok=True)
 
-# Configurar logging
 log_file = os.path.join(log_dir, 'etl.log')
 logging.basicConfig(
     level=logging.INFO,
@@ -81,7 +80,44 @@ class SimpsonsExtractor:
             json.dump(datos_extraidos, f, ensure_ascii=False, indent=4)
             
         logger.info(f"Extracción finalizada con {len(datos_extraidos)} registros")
+
+        respuesta = input("\npy ¿Deseas guardar los datos en la base de datos? (s/n): ").strip().lower()
+        if respuesta == 's':
+            self.guardar_en_db(datos_extraidos)
+
         return datos_extraidos
+
+    def guardar_en_db(self, datos):
+        """Guarda los personajes extraídos en la base de datos."""
+        try:
+            from db.database import SessionLocal
+            from db.models import Personaje
+
+            db = SessionLocal()
+            insertados = 0
+            omitidos = 0
+
+            for item in datos:
+                existe = db.query(Personaje).filter(Personaje.id == item['id']).first()
+                if existe:
+                    omitidos += 1
+                    continue
+                personaje = Personaje(
+                    id=item.get('id'),
+                    name=item.get('name'),
+                    occupation=item.get('occupation'),
+                    birthdate=item.get('birthdate'),
+                    portrait_path=item.get('portrait_path'),
+                )
+                db.add(personaje)
+                insertados += 1
+
+            db.commit()
+            db.close()
+            logger.info(f"Guardado en DB: {insertados} insertados, {omitidos} ya existían.")
+
+        except Exception as e:
+            logger.error(f"Error guardando en la base de datos: {str(e)}")
 
 if __name__ == "__main__":
     try:
