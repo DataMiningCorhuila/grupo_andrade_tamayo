@@ -81,9 +81,7 @@ class SimpsonsExtractor:
             
         logger.info(f"Extracción finalizada con {len(datos_extraidos)} registros")
 
-        respuesta = input("\npy ¿Deseas guardar los datos en la base de datos? (s/n): ").strip().lower()
-        if respuesta == 's':
-            self.guardar_en_db(datos_extraidos)
+        self.guardar_en_db(datos_extraidos)
 
         return datos_extraidos
 
