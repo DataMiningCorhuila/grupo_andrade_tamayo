@@ -518,7 +518,7 @@ with tab_episodios:
                 fig_timeline.update_layout(
                     **PLOTLY_LAYOUT,
                     height=380,
-                    title=dict(text="Episodios por ano de emision", font=dict(size=14)),
+                    title=dict(text="Episodios por año de emision", font=dict(size=14)),
                     xaxis=dict(**AXIS_STYLE, title=""),
                     yaxis=dict(**AXIS_STYLE, title="", showgrid=True),
                 )
