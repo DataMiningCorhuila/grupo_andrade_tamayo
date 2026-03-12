@@ -9,10 +9,13 @@ if BASE_DIR not in sys.path:
 import streamlit as st
 import pandas as pd
 from dotenv import load_dotenv
-from db.database import SessionLocal
+from db.database import SessionLocal, init_db
 from db.models import Personaje
 
 load_dotenv(os.path.join(BASE_DIR, '.env'))
+
+# Crear tablas si no existen
+init_db()
 
 # Dominio base para construir URLs de imágenes
 IMAGE_BASE_URL = "https://cdn.thesimpsonsapi.com/500"
