@@ -7,3 +7,5 @@ Pillow==12.1.1
 sqlalchemy==2.0.36
 psycopg2-binary==2.9.9
 streamlit
+plotly==5.22.0
+wordcloud==1.9.3

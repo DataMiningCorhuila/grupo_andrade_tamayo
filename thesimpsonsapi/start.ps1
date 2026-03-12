@@ -41,12 +41,16 @@ while (-not $ready) {
 }
 Write-Host "`nPostgreSQL listo." -ForegroundColor Green
 
-# 4. Ejecutar extractor (interactivo)
-Write-Host "[3/4] Ejecutando extractor de datos..." -ForegroundColor Green
+# 4. Inicializar base de datos (crear tablas)
+Write-Host "[3/5] Inicializando base de datos..." -ForegroundColor Green
+docker compose run --rm -e DB_HOST=postgres extractor python -m db.database
+
+# 5. Ejecutar extractor (interactivo)
+Write-Host "[4/5] Ejecutando extractor de datos..." -ForegroundColor Green
 docker compose run --rm -it -e DB_HOST=postgres extractor python scripts/extractor.py
 
-# 5. Levantar Streamlit
-Write-Host "[4/4] Iniciando Streamlit..." -ForegroundColor Green
+# 6. Levantar Streamlit
+Write-Host "[5/5] Iniciando Streamlit..." -ForegroundColor Green
 docker compose up -d streamlit
 
 Write-Host ""

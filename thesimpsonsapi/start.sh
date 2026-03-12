@@ -36,12 +36,16 @@ until docker compose exec postgres pg_isready -U "${DB_USER}" -d "${DB_NAME}" > 
 done
 echo -e "\n${GREEN}PostgreSQL listo.${NC}"
 
-# 4. Ejecutar extractor (interactivo — pregunta si guardar en DB)
-echo -e "${GREEN}[3/4] Ejecutando extractor de datos...${NC}"
+# 4. Inicializar base de datos (crear tablas)
+echo -e "${GREEN}[3/5] Inicializando base de datos...${NC}"
+docker compose run --rm -e DB_HOST=postgres extractor python -m db.database
+
+# 5. Ejecutar extractor (interactivo)
+echo -e "${GREEN}[4/5] Ejecutando extractor de datos...${NC}"
 docker compose run --rm -it -e DB_HOST=postgres extractor python scripts/extractor.py
 
-# 5. Levantar Streamlit
-echo -e "${GREEN}[4/4] Iniciando Streamlit...${NC}"
+# 6. Levantar Streamlit
+echo -e "${GREEN}[5/5] Iniciando Streamlit...${NC}"
 docker compose up -d streamlit
 
 echo -e "${GREEN}"

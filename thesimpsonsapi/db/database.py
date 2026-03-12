@@ -42,6 +42,13 @@ def init_db():
     Base.metadata.create_all(bind=engine)
 
 
+def reset_db():
+    """Elimina y recrea todas las tablas (para migraciones de esquema)."""
+    import db.models
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
+
+
 if __name__ == '__main__':
     import logging
     logging.basicConfig(level=logging.INFO)

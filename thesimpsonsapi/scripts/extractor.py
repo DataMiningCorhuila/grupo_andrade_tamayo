@@ -3,8 +3,7 @@ import os
 import sys
 import requests
 import json
-import pandas as pd
-from datetime import datetime
+import time
 from dotenv import load_dotenv
 import logging
 
@@ -28,99 +27,200 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+
 class SimpsonsExtractor:
     def __init__(self):
         self.API_URL = os.getenv('API_URL')
-        
         if not self.API_URL:
             raise ValueError("API_URL no configurada en .env")
-    
-    def extraer_personajes(self, page):
-        """Extrae datos de personajes de The Simpsons"""
-        try:
-            url = f"{self.API_URL}/characters?page={page}"
-            response = requests.get(url, timeout=10)
-            response.raise_for_status()
-            
-            data = response.json()
 
-            logger.info(f"Datos extraídos de página {page}")
-            return data
-            
-        except Exception as e:
-            logger.error(f"Error extrayendo datos de página {page}: {str(e)}")
-            return None
-    
-    def ejecutar_extraccion(self):
-        """Ejecuta la extracción para todas las ciudades"""
-        datos_extraidos = []
-        
-        logger.info(f"Iniciando extracción")
-        
+    def _extraer_paginado(self, endpoint):
+        """Extrae todos los resultados de un endpoint paginado."""
+        todos = []
         page = 1
         while True:
-            datos_personajes = self.extraer_personajes(page)
-            if datos_personajes is None or 'results' not in datos_personajes or len(datos_personajes['results']) == 0:
-                logger.info(f"No hay más datos para extraer en la página {page}. Finalizando extracción.")
+            try:
+                url = f"{self.API_URL}/{endpoint}?page={page}"
+                response = requests.get(url, timeout=15)
+                response.raise_for_status()
+                data = response.json()
+
+                resultados = data.get('results', [])
+                if not resultados:
+                    break
+
+                todos.extend(resultados)
+                logger.info(f"[{endpoint}] Página {page}: {len(resultados)} registros")
+
+                if not data.get('next'):
+                    break
+
+                page += 1
+                time.sleep(0.3)
+
+            except Exception as e:
+                logger.error(f"[{endpoint}] Error en página {page}: {e}")
                 break
-            resultados = datos_personajes.get('results', [])
-            for personaje in resultados:
-                datos_extraidos.append({
-                    'id': personaje.get('id'),
-                    'name': personaje.get('name'),
-                    'occupation': personaje.get('occupation'),
-                    'birthdate': personaje.get('birthdate'),
-                    'portrait_path': personaje.get('portrait_path')
-                
-            })       
-            page += 1
-        
-        
-        with open(os.path.join(BASE_DIR, 'data', 'simpsons_characters.json'), 'w', encoding='utf-8') as f:
-            json.dump(datos_extraidos, f, ensure_ascii=False, indent=4)
-            
-        logger.info(f"Extracción finalizada con {len(datos_extraidos)} registros")
 
-        self.guardar_en_db(datos_extraidos)
+        logger.info(f"[{endpoint}] Total extraído: {len(todos)} registros")
+        return todos
 
-        return datos_extraidos
+    def ejecutar_extraccion(self):
+        """Ejecuta la extracción de personajes, episodios y ubicaciones."""
+        logger.info("Iniciando extracción completa")
 
-    def guardar_en_db(self, datos):
-        """Guarda los personajes extraídos en la base de datos."""
+        # Personajes
+        personajes = self._extraer_paginado('characters')
+        self._guardar_json(personajes, 'simpsons_characters.json')
+        self._guardar_personajes(personajes)
+
+        # Episodios
+        episodios = self._extraer_paginado('episodes')
+        self._guardar_json(episodios, 'simpsons_episodes.json')
+        self._guardar_episodios(episodios)
+
+        # Ubicaciones
+        ubicaciones = self._extraer_paginado('locations')
+        self._guardar_json(ubicaciones, 'simpsons_locations.json')
+        self._guardar_ubicaciones(ubicaciones)
+
+        logger.info("Extracción completa finalizada")
+        return personajes, episodios, ubicaciones
+
+    def _guardar_json(self, datos, nombre_archivo):
+        """Guarda datos en un archivo JSON."""
+        ruta = os.path.join(BASE_DIR, 'data', nombre_archivo)
+        os.makedirs(os.path.dirname(ruta), exist_ok=True)
+        with open(ruta, 'w', encoding='utf-8') as f:
+            json.dump(datos, f, ensure_ascii=False, indent=4)
+        logger.info(f"JSON guardado: {nombre_archivo} ({len(datos)} registros)")
+
+    def _guardar_personajes(self, datos):
+        """Guarda o actualiza personajes en la base de datos."""
         try:
             from db.database import SessionLocal
             from db.models import Personaje
 
             db = SessionLocal()
-            insertados = 0
-            omitidos = 0
+            insertados, actualizados = 0, 0
 
             for item in datos:
-                existe = db.query(Personaje).filter(Personaje.id == item['id']).first()
-                if existe:
-                    omitidos += 1
-                    continue
-                personaje = Personaje(
-                    id=item.get('id'),
-                    name=item.get('name'),
-                    occupation=item.get('occupation'),
-                    birthdate=item.get('birthdate'),
-                    portrait_path=item.get('portrait_path'),
-                )
-                db.add(personaje)
-                insertados += 1
+                existente = db.query(Personaje).filter(Personaje.id == item['id']).first()
+                if existente:
+                    existente.name = item.get('name')
+                    existente.age = item.get('age')
+                    existente.gender = item.get('gender')
+                    existente.status = item.get('status')
+                    existente.occupation = item.get('occupation')
+                    existente.birthdate = item.get('birthdate')
+                    existente.portrait_path = item.get('portrait_path')
+                    existente.phrases = item.get('phrases', [])
+                    actualizados += 1
+                else:
+                    personaje = Personaje(
+                        id=item.get('id'),
+                        name=item.get('name'),
+                        age=item.get('age'),
+                        gender=item.get('gender'),
+                        status=item.get('status'),
+                        occupation=item.get('occupation'),
+                        birthdate=item.get('birthdate'),
+                        portrait_path=item.get('portrait_path'),
+                        phrases=item.get('phrases', []),
+                    )
+                    db.add(personaje)
+                    insertados += 1
 
             db.commit()
             db.close()
-            logger.info(f"Guardado en DB: {insertados} insertados, {omitidos} ya existían.")
+            logger.info(f"Personajes DB: {insertados} insertados, {actualizados} actualizados")
 
         except Exception as e:
-            logger.error(f"Error guardando en la base de datos: {str(e)}")
+            logger.error(f"Error guardando personajes: {e}")
+
+    def _guardar_episodios(self, datos):
+        """Guarda o actualiza episodios en la base de datos."""
+        try:
+            from db.database import SessionLocal
+            from db.models import Episodio
+
+            db = SessionLocal()
+            insertados, actualizados = 0, 0
+
+            for item in datos:
+                existente = db.query(Episodio).filter(Episodio.id == item['id']).first()
+                if existente:
+                    existente.name = item.get('name')
+                    existente.season = item.get('season')
+                    existente.episode_number = item.get('episode_number')
+                    existente.airdate = item.get('airdate')
+                    existente.synopsis = item.get('synopsis')
+                    existente.image_path = item.get('image_path')
+                    actualizados += 1
+                else:
+                    episodio = Episodio(
+                        id=item.get('id'),
+                        name=item.get('name'),
+                        season=item.get('season'),
+                        episode_number=item.get('episode_number'),
+                        airdate=item.get('airdate'),
+                        synopsis=item.get('synopsis'),
+                        image_path=item.get('image_path'),
+                    )
+                    db.add(episodio)
+                    insertados += 1
+
+            db.commit()
+            db.close()
+            logger.info(f"Episodios DB: {insertados} insertados, {actualizados} actualizados")
+
+        except Exception as e:
+            logger.error(f"Error guardando episodios: {e}")
+
+    def _guardar_ubicaciones(self, datos):
+        """Guarda o actualiza ubicaciones en la base de datos."""
+        try:
+            from db.database import SessionLocal
+            from db.models import Ubicacion
+
+            db = SessionLocal()
+            insertados, actualizados = 0, 0
+
+            for item in datos:
+                existente = db.query(Ubicacion).filter(Ubicacion.id == item['id']).first()
+                if existente:
+                    existente.name = item.get('name')
+                    existente.image_path = item.get('image_path')
+                    existente.town = item.get('town')
+                    existente.use = item.get('use')
+                    actualizados += 1
+                else:
+                    ubicacion = Ubicacion(
+                        id=item.get('id'),
+                        name=item.get('name'),
+                        image_path=item.get('image_path'),
+                        town=item.get('town'),
+                        use=item.get('use'),
+                    )
+                    db.add(ubicacion)
+                    insertados += 1
+
+            db.commit()
+            db.close()
+            logger.info(f"Ubicaciones DB: {insertados} insertados, {actualizados} actualizados")
+
+        except Exception as e:
+            logger.error(f"Error guardando ubicaciones: {e}")
+
 
 if __name__ == "__main__":
     try:
+        from db.database import init_db
+        logger.info("Inicializando tablas de base de datos...")
+        init_db()
+
         extractor = SimpsonsExtractor()
-        datos = extractor.ejecutar_extraccion()
-        
+        extractor.ejecutar_extraccion()
+
     except Exception as e:
-        logger.error(f"Error en extracción: {str(e)}")
+        logger.error(f"Error en extracción: {e}")
