@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guía didáctica — arbol_decision_educacion.ipynb</title>
+<style>
+:root {
+    --bg: #f7f8fc;
+    --bg-card: #ffffff;
+    --primary: #4F46E5;
+    --primary-soft: #EEF2FF;
+    --accent: #10B981;
+    --warn: #F59E0B;
+    --danger: #EF4444;
+    --ink: #1F2937;
+    --muted: #6B7280;
+    --line: #E5E7EB;
+    --code-bg: #0F172A;
+    --code-ink: #E2E8F0;
+    --shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+}
+* { box-sizing: border-box; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.65;
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+}
+.wrap {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 32px 24px 80px;
+}
+header.hero {
+    background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+    color: #fff;
+    padding: 48px 32px;
+    border-radius: 18px;
+    margin-bottom: 28px;
+    box-shadow: var(--shadow);
+}
+header.hero h1 {
+    margin: 0 0 12px 0;
+    font-size: 30px;
+    line-height: 1.2;
+}
+header.hero p {
+    margin: 6px 0;
+    opacity: 0.92;
+    font-size: 16px;
+}
+header.hero .badges {
+    display: flex;
+    gap: 8px;
+    margin-top: 18px;
+    flex-wrap: wrap;
+}
+header.hero .badges span {
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.25);
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+}
+.toc {
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 28px;
+    box-shadow: var(--shadow);
+}
+.toc h2 {
+    margin: 0 0 12px 0;
+    font-size: 16px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+.toc ol {
+    columns: 2;
+    column-gap: 28px;
+    padding-left: 20px;
+    margin: 0;
+    font-size: 14px;
+}
+.toc ol li { margin-bottom: 4px; }
+.toc a { color: var(--ink); text-decoration: none; }
+.toc a:hover { color: var(--primary); }
+
+.section-title {
+    margin: 40px 0 18px 0;
+    font-size: 22px;
+    color: var(--ink);
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--primary-soft);
+}
+
+.cell {
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 22px 26px;
+    margin-bottom: 22px;
+    box-shadow: var(--shadow);
+}
+.cell-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+}
+.cell-head .num {
+    background: var(--primary);
+    color: white;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 3px 10px;
+    border-radius: 8px;
+}
+.cell-head .type-md   { background: #DBEAFE; color: #1E40AF; }
+.cell-head .type-code { background: #DCFCE7; color: #166534; }
+.cell-head .tag {
+    font-size: 12px;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+.cell-head h3 {
+    margin: 0;
+    font-size: 17px;
+    flex: 1;
+    min-width: 250px;
+}
+
+.what {
+    background: var(--primary-soft);
+    border-left: 4px solid var(--primary);
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin: 12px 0;
+}
+.what strong { color: var(--primary); }
+
+.dummies {
+    background: #FFF7ED;
+    border-left: 4px solid #F97316;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin: 12px 0;
+}
+.dummies strong { color: #C2410C; }
+
+.concepts {
+    background: #F0FDF4;
+    border-left: 4px solid var(--accent);
+    padding: 12px 16px 12px 16px;
+    border-radius: 8px;
+    margin: 12px 0;
+}
+.concepts strong { color: #065F46; }
+.concepts ul { margin: 6px 0 0 0; padding-left: 22px; }
+.concepts li { margin-bottom: 4px; }
+
+.warn {
+    background: #FEF3C7;
+    border-left: 4px solid var(--warn);
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin: 12px 0;
+}
+.warn strong { color: #92400E; }
+
+pre.code {
+    background: var(--code-bg);
+    color: var(--code-ink);
+    padding: 14px 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.55;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    margin: 12px 0;
+}
+code.inline {
+    background: #F1F5F9;
+    color: #0F172A;
+    padding: 2px 6px;
+    border-radius: 5px;
+    font-size: 13px;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+}
+
+.glosario {
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 24px;
+    margin-top: 32px;
+    box-shadow: var(--shadow);
+}
+.glosario h2 {
+    margin: 0 0 16px 0;
+    color: var(--primary);
+}
+.glosario dl { margin: 0; }
+.glosario dt {
+    font-weight: 700;
+    color: var(--ink);
+    margin-top: 14px;
+}
+.glosario dd {
+    margin: 4px 0 0 0;
+    color: var(--muted);
+    font-size: 14.5px;
+}
+
+table.tabla {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 14px;
+}
+table.tabla th, table.tabla td {
+    text-align: left;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--line);
+}
+table.tabla th {
+    background: #F8FAFC;
+    color: var(--muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+}
+
+footer.foot {
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    margin-top: 40px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+}
+
+@media (max-width: 640px) {
+    .toc ol { columns: 1; }
+    header.hero { padding: 32px 22px; }
+    header.hero h1 { font-size: 23px; }
+    .wrap { padding: 20px 14px 60px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+<h1>Guía didáctica — arbol_decision_educacion.ipynb</h1>
+<p>Explicación celda por celda del notebook de Árbol de Decisión para predecir la nota final (regresión).</p>
+<div class="badges"><span>Regresión</span><span>DecisionTreeRegressor</span><span>hours → grade</span><span>3 splits</span><span>Para principiantes</span></div>
+</header>
+
+<section class="cell">
+<h2 style="margin-top:0;color:var(--primary);">📚 ¿De qué va este documento?</h2>
+<p>Este documento acompaña el notebook <strong>arbol_decision_educacion.ipynb</strong>. Cada celda del notebook tiene aquí una explicación clara, con conceptos clave y notas para principiantes.</p>
+<p>El notebook entrena un <strong>árbol de decisión de regresión</strong> que predice la <em>nota final</em> de un estudiante a partir de sus <em>horas de estudio diarias</em>. Se evalúa con tres particiones distintas (80/20, 70/30, 60/40) para verificar que el modelo sea estable.</p>
+<p>Al final del documento encontrarás un <strong>glosario rápido</strong> con todos los términos técnicos.</p>
+</section>
+
+<nav class="toc">
+<h2>📑 Índice de celdas</h2>
+<ol>
+<li><a href="#cell-1">Celda 1 — Título y resumen del notebook</a></li>
+<li><a href="#cell-2">Celda 2 — Sección I — Configuración inicial</a></li>
+<li><a href="#cell-3">Celda 3 — CELDA 1 — Importaciones y configuración del path</a></li>
+<li><a href="#cell-4">Celda 4 — Sección II — Carga de datos desde PostgreSQL</a></li>
+<li><a href="#cell-5">Celda 5 — CELDA 2 — Query SQL y carga del DataFrame</a></li>
+<li><a href="#cell-6">Celda 6 — CELDA 3 — Preparación de los vectores X e Y</a></li>
+<li><a href="#cell-7">Celda 7 — Sección III — Función de evaluación reutilizable</a></li>
+<li><a href="#cell-8">Celda 8 — CELDA 4 — Definición de evaluar_split()</a></li>
+<li><a href="#cell-9">Celda 9 — Encabezado Split 1 — 80/20</a></li>
+<li><a href="#cell-10">Celda 10 — CELDA 5 — Ejecutar Split 1 (80/20)</a></li>
+<li><a href="#cell-11">Celda 11 — Encabezado Split 2 — 70/30</a></li>
+<li><a href="#cell-12">Celda 12 — CELDA 6 — Ejecutar Split 2 (70/30)</a></li>
+<li><a href="#cell-13">Celda 13 — Encabezado Split 3 — 60/40</a></li>
+<li><a href="#cell-14">Celda 14 — CELDA 7 — Ejecutar Split 3 (60/40)</a></li>
+<li><a href="#cell-15">Celda 15 — Sección IV — Análisis consolidado</a></li>
+<li><a href="#cell-16">Celda 16 — CELDA 8 — Tabla comparativa de métricas</a></li>
+<li><a href="#cell-17">Celda 17 — CELDA 9 — Gráfico comparativo de barras</a></li>
+<li><a href="#cell-18">Celda 18 — CELDA 10 — Análisis interpretativo y recomendación</a></li>
+<li><a href="#cell-19">Celda 19 — Sección V — Visualización del árbol</a></li>
+<li><a href="#cell-20">Celda 20 — CELDA 11 — Dibujar el árbol real (primeros 4 niveles)</a></li>
+<li><a href="#cell-21">Celda 21 — CELDA 12 — Árbol pedagógico simplificado (max_depth=3)</a></li>
+<li><a href="#cell-22">Celda 22 — CELDA 13 — Reglas de decisión en formato texto</a></li>
+<li><a href="#cell-23">Celda 23 — Conclusiones finales</a></li>
+</ol>
+</nav>
+
+<h2 class="section-title">🔍 Explicación celda por celda</h2>
+<section class="cell" id="cell-1">
+<div class="cell-head">
+<span class="num">Celda 1</span>
+<span class="tag type-md">MARKDOWN</span>
+<h3>Título y resumen del notebook</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Es la portada. Explica que vamos a usar un <strong>árbol de decisión</strong> para predecir la nota final de un estudiante (<code class='inline'>grade</code>) a partir de las horas de estudio diarias (<code class='inline'>hours</code>).</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Imagina que tienes un papelito donde cada estudiante anota cuántas horas estudió y cuál fue su nota. Lo que queremos es construir una "calculadora inteligente" que, dándole las horas, te diga aproximadamente qué nota se sacará.</div>
+<div class="concepts"><strong>💡 Conceptos clave:</strong><ul><li><strong>Regresión:</strong> predecir un número (no una categoría). Aquí el número es la nota: 1.0 a 5.0.</li><li><strong>Variable predictora (X):</strong> lo que <em>conocemos</em> (horas de estudio).</li><li><strong>Variable objetivo (Y):</strong> lo que <em>queremos predecir</em> (la nota).</li><li><strong>Árbol de decisión:</strong> serie de preguntas tipo <em>"¿estudió más de 4 horas?"</em> que terminan en una predicción.</li></ul></div>
+</section><section class="cell" id="cell-2">
+<div class="cell-head">
+<span class="num">Celda 2</span>
+<span class="tag type-md">MARKDOWN</span>
+<h3>Sección I — Configuración inicial</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Es un separador de sección. Anuncia que vienen las importaciones (cargar las librerías que vamos a usar).</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Como un capítulo en un libro: te dice qué viene a continuación.</div>
+</section><section class="cell" id="cell-3">
+<div class="cell-head">
+<span class="num">Celda 3</span>
+<span class="tag type-code">CÓDIGO</span>
+<h3>CELDA 1 — Importaciones y configuración del path</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Carga todas las herramientas que vamos a usar: <code class='inline'>pandas</code> para manejar tablas, <code class='inline'>matplotlib</code> y <code class='inline'>seaborn</code> para gráficos, <code class='inline'>sklearn</code> para el modelo, y se conecta a la base de datos PostgreSQL del subproyecto educación.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Antes de cocinar, tienes que sacar los utensilios del cajón. Aquí estamos sacando los "utensilios" (librerías). También le decimos a Python <em>"el archivo de conexión a la base de datos está en esa otra carpeta"</em>.</div>
+<div class="concepts"><strong>💡 Conceptos clave:</strong><ul><li><strong>Librería / paquete:</strong> conjunto de código ya escrito que podemos reutilizar (no inventamos la rueda).</li><li><strong>sys.path:</strong> lista de carpetas donde Python busca módulos para importar.</li><li><strong>engine:</strong> objeto que sabe cómo hablar con PostgreSQL (lleva usuario, contraseña, host).</li></ul></div>
+<pre class="code">import pandas as pd
+import seaborn as sns
+from sklearn.tree import DecisionTreeRegressor
+from scripts.database import engine</pre>
+</section><section class="cell" id="cell-4">
+<div class="cell-head">
+<span class="num">Celda 4</span>
+<span class="tag type-md">MARKDOWN</span>
+<h3>Sección II — Carga de datos desde PostgreSQL</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Anuncia que vamos a traer los datos desde la base de datos.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Es el aviso de "ahora vamos a sacar la información de la nevera". La nevera aquí es PostgreSQL.</div>
+</section><section class="cell" id="cell-5">
+<div class="cell-head">
+<span class="num">Celda 5</span>
+<span class="tag type-code">CÓDIGO</span>
+<h3>CELDA 2 — Query SQL y carga del DataFrame</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Ejecuta una consulta SQL que une dos tablas (<code class='inline'>registros_estudiantes</code> + <code class='inline'>instituciones</code>) y trae solo dos columnas: <code class='inline'>hours</code> (horas estudiadas) y <code class='inline'>grade</code> (nota).</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Como pedirle a un mesero: <em>"Solo tráeme las horas estudiadas y la nota de cada estudiante"</em>. El resultado llega en una tabla (DataFrame) que es como una hoja de Excel dentro de Python.</div>
+<div class="concepts"><strong>💡 Conceptos clave:</strong><ul><li><strong>JOIN:</strong> pegar dos tablas usando una columna en común (aquí: <code class='inline'>institucion_id</code>).</li><li><strong>DataFrame:</strong> tabla con filas y columnas, tipo Excel pero en Python.</li><li><strong>read_sql:</strong> función de pandas que ejecuta SQL y devuelve un DataFrame.</li></ul></div>
+<pre class="code">QUERY = &quot;SELECT r.hours, r.grade FROM registros_estudiantes r JOIN instituciones i ...&quot;
+df = pd.read_sql(QUERY, engine)</pre>
+</section><section class="cell" id="cell-6">
+<div class="cell-head">
+<span class="num">Celda 6</span>
+<span class="tag type-code">CÓDIGO</span>
+<h3>CELDA 3 — Preparación de los vectores X e Y</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Separa la tabla en dos cosas: <code class='inline'>X</code> (lo que conoces: horas) e <code class='inline'>y</code> (lo que quieres predecir: la nota). También muestra estadísticas: media, mínimo, máximo.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Si fueras a entrenar a un perro para reconocer galletas, <code class='inline'>X</code> serían las fotos y <code class='inline'>y</code> sería la etiqueta "galleta sí / galleta no". Aquí <code class='inline'>X</code> son las horas y <code class='inline'>y</code> es la nota.</div>
+<div class="concepts"><strong>💡 Conceptos clave:</strong><ul><li><strong>Mayúsculas en X, minúscula en y:</strong> convención. X es matriz (varias columnas posibles), y es un vector (una sola columna).</li><li><strong>.describe():</strong> resumen estadístico — útil para ver si hay valores raros.</li></ul></div>
+</section><section class="cell" id="cell-7">
+<div class="cell-head">
+<span class="num">Celda 7</span>
+<span class="tag type-md">MARKDOWN</span>
+<h3>Sección III — Función de evaluación reutilizable</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Va a definir una función que entrena el árbol y calcula métricas. La idea es escribirla UNA vez y reusarla tres veces (uno por cada split).</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> En vez de copiar y pegar el mismo procedimiento tres veces, lo escribimos una vez como una receta y le decimos: <em>"haz esto pero con esta proporción"</em>.</div>
+</section><section class="cell" id="cell-8">
+<div class="cell-head">
+<span class="num">Celda 8</span>
+<span class="tag type-code">CÓDIGO</span>
+<h3>CELDA 4 — Definición de evaluar_split()</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Define una función que recibe los datos, los divide en entrenamiento/prueba, entrena el árbol, calcula 4 métricas (R², MSE, RMSE, MAE) y dibuja dos gráficos: residuos y predicho vs real.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Es como crear un botón mágico llamado "evaluar_split". Cuando lo aprietas con cierta proporción, hace TODO el trabajo: entrena, califica, dibuja, y te entrega un reporte.</div>
+<div class="concepts"><strong>💡 Conceptos clave:</strong><ul><li><strong>train_test_split:</strong> divide los datos en dos partes — una para que el modelo aprenda (train) y otra para examinarlo (test).</li><li><strong>random_state=42:</strong> semilla aleatoria — garantiza que cada vez que corras el código obtengas el mismo split. (El 42 es por <em>La guía del autoestopista galáctico</em>; es solo un número convencional.)</li><li><strong>R²:</strong> qué porcentaje de la variabilidad de la nota explica el modelo. 1.0 = perfecto, 0 = inútil.</li><li><strong>RMSE:</strong> error promedio en la misma unidad que la nota. Si RMSE = 0.3, el modelo se equivoca por ±0.3 puntos en promedio.</li><li><strong>MAE:</strong> parecido al RMSE pero sin elevar al cuadrado. Más fácil de interpretar.</li><li><strong>LOWESS:</strong> línea curva suave que sigue la tendencia de los puntos — útil para detectar patrones en los residuos.</li></ul></div>
+</section><section class="cell" id="cell-9">
+<div class="cell-head">
+<span class="num">Celda 9</span>
+<span class="tag type-md">MARKDOWN</span>
+<h3>Encabezado Split 1 — 80/20</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Anuncia el primer experimento: 80% de los datos para entrenar, 20% para examinar.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Como un profesor que da 80 ejercicios para practicar y deja 20 para el examen final.</div>
+</section><section class="cell" id="cell-10">
+<div class="cell-head">
+<span class="num">Celda 10</span>
+<span class="tag type-code">CÓDIGO</span>
+<h3>CELDA 5 — Ejecutar Split 1 (80/20)</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Llama a la función con <code class='inline'>test_size=0.20</code>. Entrena, predice y guarda métricas del primer experimento.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Aprieta el botón mágico con la receta "80% entrenar, 20% examen". Te muestra el resultado del primer intento.</div>
+<div class="concepts"><strong>💡 Conceptos clave:</strong><ul><li><strong>test_size=0.20:</strong> el 20% queda para test. El otro 80% es para train.</li><li><strong>Por qué se hace en varios splits:</strong> queremos ver si el modelo es estable o si depende mucho del azar de la división.</li></ul></div>
+</section><section class="cell" id="cell-11">
+<div class="cell-head">
+<span class="num">Celda 11</span>
+<span class="tag type-md">MARKDOWN</span>
+<h3>Encabezado Split 2 — 70/30</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Anuncia el segundo experimento con menos datos para entrenar.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Mismo profesor, pero ahora da menos ejercicios de práctica (70) y deja más para examen (30).</div>
+</section><section class="cell" id="cell-12">
+<div class="cell-head">
+<span class="num">Celda 12</span>
+<span class="tag type-code">CÓDIGO</span>
+<h3>CELDA 6 — Ejecutar Split 2 (70/30)</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Mismo proceso, pero ahora con 70% entrenamiento y 30% prueba.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Botón mágico, otra proporción. ¿El modelo aguanta o se cae?</div>
+</section><section class="cell" id="cell-13">
+<div class="cell-head">
+<span class="num">Celda 13</span>
+<span class="tag type-md">MARKDOWN</span>
+<h3>Encabezado Split 3 — 60/40</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> El experimento más estricto: menos datos para entrenar, más para examinar.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Profesor exigente: solo 60 ejercicios de práctica y 40 de examen.</div>
+</section><section class="cell" id="cell-14">
+<div class="cell-head">
+<span class="num">Celda 14</span>
+<span class="tag type-code">CÓDIGO</span>
+<h3>CELDA 7 — Ejecutar Split 3 (60/40)</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Repite el experimento con 60/40.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Última prueba con la división más exigente. Si aquí también funciona bien, el modelo es robusto.</div>
+</section><section class="cell" id="cell-15">
+<div class="cell-head">
+<span class="num">Celda 15</span>
+<span class="tag type-md">MARKDOWN</span>
+<h3>Sección IV — Análisis consolidado</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Anuncia que vamos a juntar los resultados de los tres splits para compararlos.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Hora de hacer la tabla comparativa: ¿cuál fue el mejor experimento?</div>
+</section><section class="cell" id="cell-16">
+<div class="cell-head">
+<span class="num">Celda 16</span>
+<span class="tag type-code">CÓDIGO</span>
+<h3>CELDA 8 — Tabla comparativa de métricas</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Construye un DataFrame con los 4 indicadores (R², MSE, RMSE, MAE) para los 3 splits y lo imprime.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Como un boletín de notas con las calificaciones de los 3 experimentos lado a lado.</div>
+</section><section class="cell" id="cell-17">
+<div class="cell-head">
+<span class="num">Celda 17</span>
+<span class="tag type-code">CÓDIGO</span>
+<h3>CELDA 9 — Gráfico comparativo de barras</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Dibuja 4 gráficos de barras (uno por métrica) comparando los splits visualmente.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> La misma tabla pero en gráficos. Más fácil ver de un vistazo qué split ganó.</div>
+<div class="concepts"><strong>💡 Conceptos clave:</strong><ul><li><strong>Visualización:</strong> los números en tabla son útiles, pero los gráficos cuentan la historia más rápido.</li></ul></div>
+</section><section class="cell" id="cell-18">
+<div class="cell-head">
+<span class="num">Celda 18</span>
+<span class="tag type-code">CÓDIGO</span>
+<h3>CELDA 10 — Análisis interpretativo y recomendación</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Calcula el rango (máx − mín) de cada métrica entre splits. Si el rango es chiquito → modelo estable; si es grande → posible overfitting. También recomienda los siguientes pasos.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> El "diagnóstico médico" del modelo: ¿se está esforzando lo suficiente? ¿Está memorizando en vez de aprender? Da consejos.</div>
+<div class="concepts"><strong>💡 Conceptos clave:</strong><ul><li><strong>Overfitting:</strong> el modelo memoriza los datos de entrenamiento pero falla con datos nuevos. Es como un estudiante que memoriza las respuestas del año pasado y no sabe responder preguntas distintas.</li><li><strong>Underfitting:</strong> lo contrario — el modelo es demasiado simple y no captura lo importante.</li><li><strong>Generalización:</strong> capacidad del modelo de funcionar bien con datos que NUNCA vio.</li></ul></div>
+<div class="warn"><strong>⚠️ Ojo aquí:</strong> Un árbol sin restricciones tiende a memorizar (overfit). Por eso al final se recomienda probar con <code class='inline'>max_depth</code> limitado o usar ensembles como Random Forest / XGBoost.</div>
+</section><section class="cell" id="cell-19">
+<div class="cell-head">
+<span class="num">Celda 19</span>
+<span class="tag type-md">MARKDOWN</span>
+<h3>Sección V — Visualización del árbol</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Anuncia que vamos a dibujar el árbol para entender cómo decide.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Hora de abrir la caja negra del modelo y ver qué preguntas se hace para predecir.</div>
+</section><section class="cell" id="cell-20">
+<div class="cell-head">
+<span class="num">Celda 20</span>
+<span class="tag type-code">CÓDIGO</span>
+<h3>CELDA 11 — Dibujar el árbol real (primeros 4 niveles)</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Toma el árbol completo (del Split 80/20) y dibuja solo los primeros 4 niveles (porque el árbol completo es enorme).</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> El árbol real es como un mapa del mundo entero. Aquí solo mostramos el zoom de Sudamérica — los primeros 4 niveles — para que se entienda.</div>
+<div class="concepts"><strong>💡 Conceptos clave:</strong><ul><li><strong>Profundidad del árbol:</strong> cuántas preguntas en cadena se hace el modelo antes de dar una respuesta.</li><li><strong>Hoja terminal:</strong> nodo final donde el árbol da su predicción.</li><li><strong>plot_tree:</strong> función de sklearn que dibuja el árbol con sus condiciones.</li></ul></div>
+</section><section class="cell" id="cell-21">
+<div class="cell-head">
+<span class="num">Celda 21</span>
+<span class="tag type-code">CÓDIGO</span>
+<h3>CELDA 12 — Árbol pedagógico simplificado (max_depth=3)</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Reentrena un árbol pequeño (solo 3 niveles) PURAMENTE para visualización clara. Compara su R² con el árbol completo.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Es como una explicación "resumen" del modelo. Sacrificamos un poco de precisión a cambio de que tú puedas entender qué hace.</div>
+<div class="concepts"><strong>💡 Conceptos clave:</strong><ul><li><strong>max_depth:</strong> hiperparámetro que limita cuán "profundo" puede crecer el árbol. Menos profundidad = más simple, menos overfitting, pero quizás menos preciso.</li></ul></div>
+</section><section class="cell" id="cell-22">
+<div class="cell-head">
+<span class="num">Celda 22</span>
+<span class="tag type-code">CÓDIGO</span>
+<h3>CELDA 13 — Reglas de decisión en formato texto</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Imprime el árbol como texto. Cada línea es una regla "si... entonces...".</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Es como traducir el árbol a una receta tipo: <em>"si estudiaste menos de 2 horas, tu nota será 2.3; si estudiaste entre 2 y 4, será 3.1; etc."</em></div>
+<div class="concepts"><strong>💡 Conceptos clave:</strong><ul><li><strong>export_text:</strong> función que convierte el árbol en reglas legibles.</li><li><strong>Interpretabilidad:</strong> los árboles son uno de los modelos más fáciles de explicar — ventaja sobre redes neuronales.</li></ul></div>
+</section><section class="cell" id="cell-23">
+<div class="cell-head">
+<span class="num">Celda 23</span>
+<span class="tag type-md">MARKDOWN</span>
+<h3>Conclusiones finales</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Resumen de los hallazgos y próximos pasos sugeridos (regularizar el árbol, probar Random Forest o Gradient Boosting).</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> El cierre del documento: lo que aprendimos y qué podríamos hacer después.</div>
+</section>
+
+<section class="glosario">
+<h2>📖 Glosario rápido</h2>
+<dl>
+<dt>Aprendizaje supervisado</dt><dd>Tipo de ML donde le mostramos al modelo ejemplos etiquetados (entrada + respuesta correcta) para que aprenda.</dd>
+<dt>Regresión</dt><dd>Predecir un número continuo (ejemplo: una nota, un precio, una temperatura).</dd>
+<dt>Árbol de decisión</dt><dd>Modelo que toma decisiones como un diagrama de flujo: una serie de preguntas Sí/No que conducen a una predicción.</dd>
+<dt>Train / Test split</dt><dd>Dividir los datos en dos: una parte para entrenar el modelo, otra para examinarlo con datos que nunca vio.</dd>
+<dt>R² (R-cuadrado)</dt><dd>Porcentaje de la variabilidad del objetivo que explica el modelo. 1.0 es perfecto, 0 es inútil. Puede ser negativo si el modelo es peor que predecir la media.</dd>
+<dt>RMSE</dt><dd>Raíz del error cuadrático medio. Mide cuánto se equivoca en promedio, en la misma unidad que la variable objetivo.</dd>
+<dt>MAE</dt><dd>Error absoluto medio. Promedio del valor absoluto de los errores. Menos sensible a outliers que RMSE.</dd>
+<dt>Overfitting</dt><dd>Cuando el modelo memoriza los datos de entrenamiento y falla con datos nuevos. Como un estudiante que copia las respuestas del simulacro sin entender el tema.</dd>
+<dt>Hiperparámetro</dt><dd>Configuración del modelo que tú eliges antes de entrenar (ejemplo: max_depth). No se aprende automáticamente.</dd>
+<dt>Residuo</dt><dd>Diferencia entre el valor real y el predicho. Residuo = real - predicho. Idealmente debería ser pequeño y sin patrones.</dd>
+<dt>LOWESS</dt><dd>Línea curva suavizada que se ajusta a los puntos. Útil para detectar si hay patrones que el modelo no está capturando.</dd>
+<dt>DataFrame</dt><dd>Estructura tipo tabla de pandas — equivale a una hoja de cálculo dentro de Python.</dd>
+<dt>engine (SQLAlchemy)</dt><dd>Objeto que sabe conectarse a una base de datos. Lleva la dirección, usuario y contraseña.</dd>
+</dl>
+</section>
+
+<footer class="foot">
+Generado para acompañar el notebook. Si una celda dice "no entiendo nada", relee la sección
+🧒 <em>Para dummies</em> — está pensada justo para eso.
+</footer>
+
+</div>
+</body>
+</html>

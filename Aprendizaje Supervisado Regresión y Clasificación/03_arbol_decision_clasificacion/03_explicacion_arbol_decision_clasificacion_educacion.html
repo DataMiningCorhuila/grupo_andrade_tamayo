@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guía didáctica — arbol_decision_clasificacion_educacion.ipynb</title>
+<style>
+:root {
+    --bg: #f7f8fc;
+    --bg-card: #ffffff;
+    --primary: #4F46E5;
+    --primary-soft: #EEF2FF;
+    --accent: #10B981;
+    --warn: #F59E0B;
+    --danger: #EF4444;
+    --ink: #1F2937;
+    --muted: #6B7280;
+    --line: #E5E7EB;
+    --code-bg: #0F172A;
+    --code-ink: #E2E8F0;
+    --shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+}
+* { box-sizing: border-box; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.65;
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+}
+.wrap {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 32px 24px 80px;
+}
+header.hero {
+    background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+    color: #fff;
+    padding: 48px 32px;
+    border-radius: 18px;
+    margin-bottom: 28px;
+    box-shadow: var(--shadow);
+}
+header.hero h1 {
+    margin: 0 0 12px 0;
+    font-size: 30px;
+    line-height: 1.2;
+}
+header.hero p {
+    margin: 6px 0;
+    opacity: 0.92;
+    font-size: 16px;
+}
+header.hero .badges {
+    display: flex;
+    gap: 8px;
+    margin-top: 18px;
+    flex-wrap: wrap;
+}
+header.hero .badges span {
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.25);
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+}
+.toc {
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 28px;
+    box-shadow: var(--shadow);
+}
+.toc h2 {
+    margin: 0 0 12px 0;
+    font-size: 16px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+.toc ol {
+    columns: 2;
+    column-gap: 28px;
+    padding-left: 20px;
+    margin: 0;
+    font-size: 14px;
+}
+.toc ol li { margin-bottom: 4px; }
+.toc a { color: var(--ink); text-decoration: none; }
+.toc a:hover { color: var(--primary); }
+
+.section-title {
+    margin: 40px 0 18px 0;
+    font-size: 22px;
+    color: var(--ink);
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--primary-soft);
+}
+
+.cell {
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 22px 26px;
+    margin-bottom: 22px;
+    box-shadow: var(--shadow);
+}
+.cell-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+}
+.cell-head .num {
+    background: var(--primary);
+    color: white;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 3px 10px;
+    border-radius: 8px;
+}
+.cell-head .type-md   { background: #DBEAFE; color: #1E40AF; }
+.cell-head .type-code { background: #DCFCE7; color: #166534; }
+.cell-head .tag {
+    font-size: 12px;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+.cell-head h3 {
+    margin: 0;
+    font-size: 17px;
+    flex: 1;
+    min-width: 250px;
+}
+
+.what {
+    background: var(--primary-soft);
+    border-left: 4px solid var(--primary);
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin: 12px 0;
+}
+.what strong { color: var(--primary); }
+
+.dummies {
+    background: #FFF7ED;
+    border-left: 4px solid #F97316;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin: 12px 0;
+}
+.dummies strong { color: #C2410C; }
+
+.concepts {
+    background: #F0FDF4;
+    border-left: 4px solid var(--accent);
+    padding: 12px 16px 12px 16px;
+    border-radius: 8px;
+    margin: 12px 0;
+}
+.concepts strong { color: #065F46; }
+.concepts ul { margin: 6px 0 0 0; padding-left: 22px; }
+.concepts li { margin-bottom: 4px; }
+
+.warn {
+    background: #FEF3C7;
+    border-left: 4px solid var(--warn);
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin: 12px 0;
+}
+.warn strong { color: #92400E; }
+
+pre.code {
+    background: var(--code-bg);
+    color: var(--code-ink);
+    padding: 14px 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.55;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    margin: 12px 0;
+}
+code.inline {
+    background: #F1F5F9;
+    color: #0F172A;
+    padding: 2px 6px;
+    border-radius: 5px;
+    font-size: 13px;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+}
+
+.glosario {
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 24px;
+    margin-top: 32px;
+    box-shadow: var(--shadow);
+}
+.glosario h2 {
+    margin: 0 0 16px 0;
+    color: var(--primary);
+}
+.glosario dl { margin: 0; }
+.glosario dt {
+    font-weight: 700;
+    color: var(--ink);
+    margin-top: 14px;
+}
+.glosario dd {
+    margin: 4px 0 0 0;
+    color: var(--muted);
+    font-size: 14.5px;
+}
+
+table.tabla {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 14px;
+}
+table.tabla th, table.tabla td {
+    text-align: left;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--line);
+}
+table.tabla th {
+    background: #F8FAFC;
+    color: var(--muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+}
+
+footer.foot {
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    margin-top: 40px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+}
+
+@media (max-width: 640px) {
+    .toc ol { columns: 1; }
+    header.hero { padding: 32px 22px; }
+    header.hero h1 { font-size: 23px; }
+    .wrap { padding: 20px 14px 60px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+<h1>Guía didáctica — arbol_decision_clasificacion_educacion.ipynb</h1>
+<p>Explicación celda por celda del notebook de Árbol CART para predecir aprobación académica (clasificación binaria).</p>
+<div class="badges"><span>Clasificación binaria</span><span>DecisionTreeClassifier</span><span>aprobado (grade ≥ 3.0)</span><span>3 splits + max_depth</span><span>Para principiantes</span></div>
+</header>
+
+<section class="cell">
+<h2 style="margin-top:0;color:var(--primary);">📚 ¿De qué va este documento?</h2>
+<p>Este documento acompaña el notebook <strong>arbol_decision_clasificacion_educacion.ipynb</strong>. Cada celda del notebook tiene aquí una explicación clara, con conceptos clave y notas para principiantes.</p>
+<p>El notebook entrena un <strong>árbol de decisión CART</strong> para predecir si un estudiante aprobará o no la asignatura — una pregunta binaria (sí/no). El umbral usado es la nota colombiana estándar: 3.0.</p>
+<p>Además de los tres splits, se busca la profundidad óptima del árbol y se interpretan las variables que más influyen en la predicción.</p>
+<p>Al final encontrarás un <strong>glosario rápido</strong> con todos los términos técnicos.</p>
+</section>
+
+<nav class="toc">
+<h2>📑 Índice de celdas</h2>
+<ol>
+<li><a href="#cell-1">Celda 1 — Título y resumen del notebook</a></li>
+<li><a href="#cell-2">Celda 2 — Sección I — Configuración inicial</a></li>
+<li><a href="#cell-3">Celda 3 — CELDA 1 — Importaciones</a></li>
+<li><a href="#cell-4">Celda 4 — Sección II — Extracción de datos desde PostgreSQL</a></li>
+<li><a href="#cell-5">Celda 5 — CELDA 2 — Query SQL con CASE WHEN para crear aprobado</a></li>
+<li><a href="#cell-6">Celda 6 — Sección III — Validación y exploración</a></li>
+<li><a href="#cell-7">Celda 7 — CELDA 3 — Validación y exploración del dataset</a></li>
+<li><a href="#cell-8">Celda 8 — Sección IV — Preprocesamiento</a></li>
+<li><a href="#cell-9">Celda 9 — CELDA 4 — Preprocesamiento completo</a></li>
+<li><a href="#cell-10">Celda 10 — Sección V — Entrenamiento y evaluación con tres splits</a></li>
+<li><a href="#cell-11">Celda 11 — CELDA 5 — Función entrenar_evaluar()</a></li>
+<li><a href="#cell-12">Celda 12 — CELDA 6 — Ejecutar los 3 splits y mostrar tabla</a></li>
+<li><a href="#cell-13">Celda 13 — Sección VI — Búsqueda de max_depth óptimo</a></li>
+<li><a href="#cell-14">Celda 14 — CELDA 7 — Curvas de aprendizaje variando max_depth</a></li>
+<li><a href="#cell-15">Celda 15 — Sección VII — Visualizaciones</a></li>
+<li><a href="#cell-16">Celda 16 — CELDA 8 — Curvas ROC comparativas</a></li>
+<li><a href="#cell-17">Celda 17 — CELDA 9 — Matrices de confusión (3 splits)</a></li>
+<li><a href="#cell-18">Celda 18 — CELDA 10 — Gráfico de barras de las 5 métricas</a></li>
+<li><a href="#cell-19">Celda 19 — Sección VIII — Importancia de variables (Feature Importance)</a></li>
+<li><a href="#cell-20">Celda 20 — CELDA 11 — Gráfico de Feature Importance Gini</a></li>
+<li><a href="#cell-21">Celda 21 — Sección IX — Tabla final de métricas</a></li>
+<li><a href="#cell-22">Celda 22 — CELDA 12 — DataFrame resumen con formato</a></li>
+<li><a href="#cell-23">Celda 23 — Sección X — Conclusiones</a></li>
+</ol>
+</nav>
+
+<h2 class="section-title">🔍 Explicación celda por celda</h2>
+<section class="cell" id="cell-1">
+<div class="cell-head">
+<span class="num">Celda 1</span>
+<span class="tag type-md">MARKDOWN</span>
+<h3>Título y resumen del notebook</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Explica que vamos a usar un <strong>árbol de decisión CART</strong> para predecir si un estudiante aprobará o no (variable binaria <code class='inline'>aprobado = 1</code> si la nota es ≥ 3.0).</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Igual que el otro notebook, pero en lugar de adivinar la NOTA exacta, queremos adivinar SOLO una cosa: <em>¿este estudiante va a pasar la materia o no?</em> Es una pregunta de SÍ o NO.</div>
+<div class="concepts"><strong>💡 Conceptos clave:</strong><ul><li><strong>Clasificación binaria:</strong> predecir entre dos categorías (sí/no, 1/0, aprobado/reprobado).</li><li><strong>CART:</strong> Classification And Regression Trees — el tipo de árbol que usa scikit-learn.</li><li><strong>Criterio Gini:</strong> mide "qué tan mezcladas" están las clases en un nodo. Cuanto menor sea, más limpio (más homogéneo) es el nodo.</li></ul></div>
+</section><section class="cell" id="cell-2">
+<div class="cell-head">
+<span class="num">Celda 2</span>
+<span class="tag type-md">MARKDOWN</span>
+<h3>Sección I — Configuración inicial</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Anuncia las importaciones que vienen.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Vamos a sacar las herramientas del cajón otra vez.</div>
+</section><section class="cell" id="cell-3">
+<div class="cell-head">
+<span class="num">Celda 3</span>
+<span class="tag type-code">CÓDIGO</span>
+<h3>CELDA 1 — Importaciones</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Carga librerías similares al notebook de regresión, pero con métricas de clasificación: accuracy, precision, recall, F1, ROC-AUC, matriz de confusión.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Cambiamos los "utensilios" porque ahora estamos haciendo otro plato: en vez de medir errores en puntos, vamos a contar aciertos y fallos.</div>
+<div class="concepts"><strong>💡 Conceptos clave:</strong><ul><li><strong>DecisionTreeClassifier:</strong> el clasificador (versión clasificación del árbol).</li><li><strong>StandardScaler:</strong> escalador estándar — NO lo usamos aquí porque los árboles no lo necesitan (son invariantes a la escala).</li></ul></div>
+<pre class="code">from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score</pre>
+</section><section class="cell" id="cell-4">
+<div class="cell-head">
+<span class="num">Celda 4</span>
+<span class="tag type-md">MARKDOWN</span>
+<h3>Sección II — Extracción de datos desde PostgreSQL</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Anuncia que vamos a traer los datos con la variable objetivo binaria ya construida.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Vamos a pedir los datos pero esta vez también queremos una columna nueva: <em>¿aprobó o no?</em></div>
+</section><section class="cell" id="cell-5">
+<div class="cell-head">
+<span class="num">Celda 5</span>
+<span class="tag type-code">CÓDIGO</span>
+<h3>CELDA 2 — Query SQL con CASE WHEN para crear aprobado</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Trae todas las columnas relevantes + crea una columna nueva <code class='inline'>aprobado</code> usando <code class='inline'>CASE WHEN grade >= 3.0 THEN 1 ELSE 0 END</code>. Imprime el balance de clases.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> El <code class='inline'>CASE WHEN</code> es un "si... entonces..." dentro de SQL. Le decimos: <em>"si la nota es ≥ 3.0, ponme 1 (aprobado); si no, 0 (reprobado)"</em>.</div>
+<div class="concepts"><strong>💡 Conceptos clave:</strong><ul><li><strong>CASE WHEN:</strong> condicional en SQL. Equivalente al if/else en Python.</li><li><strong>Balance de clases:</strong> qué proporción de 1's vs 0's tienes. Si es muy desbalanceado (ej: 95% / 5%), el modelo puede tener problemas.</li><li><strong>text():</strong> función de SQLAlchemy 2.0 que envuelve queries SQL como strings seguros.</li></ul></div>
+<div class="warn"><strong>⚠️ Ojo aquí:</strong> Aquí mostramos cuántos aprueban y cuántos reprueban. Si todos aprueban (100%), no hay nada que predecir.</div>
+</section><section class="cell" id="cell-6">
+<div class="cell-head">
+<span class="num">Celda 6</span>
+<span class="tag type-md">MARKDOWN</span>
+<h3>Sección III — Validación y exploración</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Anuncia que vamos a revisar el dataset antes de entrenar.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Antes de cocinar, asegúrate de que los ingredientes estén buenos.</div>
+</section><section class="cell" id="cell-7">
+<div class="cell-head">
+<span class="num">Celda 7</span>
+<span class="tag type-code">CÓDIGO</span>
+<h3>CELDA 3 — Validación y exploración del dataset</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Muestra los tipos de cada columna, si hay nulos, el balance de la variable objetivo y la distribución por institución. También compara las estadísticas de <code class='inline'>grade</code> entre aprobados y reprobados.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Es como inspeccionar las verduras antes de cocinar: ¿están podridas? ¿son las que pediste? ¿qué tan diferentes son los grupos?</div>
+<div class="concepts"><strong>💡 Conceptos clave:</strong><ul><li><strong>Valores nulos:</strong> celdas vacías. Hay que rellenarlas o quitarlas antes de entrenar.</li><li><strong>EDA (Exploratory Data Analysis):</strong> exploración inicial para conocer los datos.</li></ul></div>
+</section><section class="cell" id="cell-8">
+<div class="cell-head">
+<span class="num">Celda 8</span>
+<span class="tag type-md">MARKDOWN</span>
+<h3>Sección IV — Preprocesamiento</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Anuncia los pasos para preparar los datos: extraer features de fecha, rellenar nulos, codificar variables categóricas.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Ahora vamos a limpiar y arreglar los ingredientes para que el modelo los pueda usar.</div>
+</section><section class="cell" id="cell-9">
+<div class="cell-head">
+<span class="num">Celda 9</span>
+<span class="tag type-code">CÓDIGO</span>
+<h3>CELDA 4 — Preprocesamiento completo</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Extrae mes y día de la semana de la fecha, rellena nulos con la mediana, hace one-hot encoding de <code class='inline'>institucion</code>, y separa X (features) de y (objetivo). <strong>Importante:</strong> excluye <code class='inline'>grade</code> de X para evitar data leakage.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Mira: si dejamos <code class='inline'>grade</code> entre las features, el modelo va a hacer trampa — porque <code class='inline'>aprobado</code> se calcula DIRECTAMENTE desde <code class='inline'>grade</code>. Es como darle al estudiante las respuestas antes del examen.</div>
+<div class="concepts"><strong>💡 Conceptos clave:</strong><ul><li><strong>One-hot encoding:</strong> convierte una columna categórica ("institución A", "institución B", ...) en varias columnas 0/1. Una por cada categoría.</li><li><strong>drop_first=True:</strong> elimina una de las columnas creadas para evitar multicolinealidad (redundancia).</li><li><strong>Data leakage (fuga de datos):</strong> cuando una feature contiene información del objetivo. Hace que el modelo se vea muy bien pero falle en producción.</li><li><strong>Mediana:</strong> valor del medio cuando ordenas los datos. Mejor que la media para rellenar nulos porque no se ve afectada por outliers.</li></ul></div>
+<div class="warn"><strong>⚠️ Ojo aquí:</strong> Excluir <code class='inline'>grade</code> de X es crítico. Sin esa línea el modelo tendría 100% accuracy <em>tramposa</em>.</div>
+</section><section class="cell" id="cell-10">
+<div class="cell-head">
+<span class="num">Celda 10</span>
+<span class="tag type-md">MARKDOWN</span>
+<h3>Sección V — Entrenamiento y evaluación con tres splits</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Anuncia la estrategia: entrenar 3 modelos con distintas proporciones train/test.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Como hicimos en regresión, vamos a probar el modelo 3 veces para asegurarnos de que sea estable.</div>
+</section><section class="cell" id="cell-11">
+<div class="cell-head">
+<span class="num">Celda 11</span>
+<span class="tag type-code">CÓDIGO</span>
+<h3>CELDA 5 — Función entrenar_evaluar()</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Define una función que entrena el árbol con un split dado y calcula 5 métricas de clasificación: accuracy, precision, recall, F1-Score, ROC-AUC. También guarda los datos para dibujar la curva ROC y la matriz de confusión.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Otra vez el "botón mágico", pero esta vez para clasificación. Calcula más métricas porque clasificar tiene más matices que predecir un número.</div>
+<div class="concepts"><strong>💡 Conceptos clave:</strong><ul><li><strong>Accuracy:</strong> porcentaje de aciertos. <em>De 100 estudiantes, ¿a cuántos le acerté?</em> Engañosa si hay desbalance.</li><li><strong>Precision:</strong> de los que predije como aprobados, ¿cuántos realmente aprobaron? Mide "falsos positivos".</li><li><strong>Recall:</strong> de los que realmente aprobaron, ¿a cuántos identifiqué? Mide "falsos negativos".</li><li><strong>F1-Score:</strong> promedio armónico de precision y recall. Buena métrica cuando hay desbalance.</li><li><strong>ROC-AUC:</strong> qué tan bien distingue el modelo entre las dos clases. 1.0 = perfecto, 0.5 = aleatorio.</li><li><strong>class_weight='balanced':</strong> le dice al modelo que dé más peso a la clase minoritaria. Compensa el desbalance.</li><li><strong>stratify=y:</strong> al hacer el split, mantiene la misma proporción de 1's y 0's en train y test.</li></ul></div>
+</section><section class="cell" id="cell-12">
+<div class="cell-head">
+<span class="num">Celda 12</span>
+<span class="tag type-code">CÓDIGO</span>
+<h3>CELDA 6 — Ejecutar los 3 splits y mostrar tabla</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Llama a la función con 3 splits (80/20, 60/40, 70/30) y muestra una tabla comparativa con las 5 métricas.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Botón mágico × 3. Te da un boletín con las calificaciones del modelo en cada experimento.</div>
+</section><section class="cell" id="cell-13">
+<div class="cell-head">
+<span class="num">Celda 13</span>
+<span class="tag type-md">MARKDOWN</span>
+<h3>Sección VI — Búsqueda de max_depth óptimo</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Anuncia que vamos a probar distintas profundidades del árbol para encontrar la mejor.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Como cuando ajustas el horno: probamos varias temperaturas para encontrar la perfecta.</div>
+</section><section class="cell" id="cell-14">
+<div class="cell-head">
+<span class="num">Celda 14</span>
+<span class="tag type-code">CÓDIGO</span>
+<h3>CELDA 7 — Curvas de aprendizaje variando max_depth</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Entrena 15 modelos con <code class='inline'>max_depth</code> de 1 a 15 y dibuja cómo varían Accuracy, ROC-AUC y F1 en train y test. Identifica el <code class='inline'>max_depth</code> que maximiza F1 en test.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Imagínate un gráfico donde el eje X es <em>"qué tan profundo dejo crecer el árbol"</em> y el eje Y es <em>"qué tan bien predice"</em>. Hay un punto óptimo: ni muy poco (perezoso), ni mucho (tramposo).</div>
+<div class="concepts"><strong>💡 Conceptos clave:</strong><ul><li><strong>Curva de aprendizaje:</strong> gráfico que muestra cómo cambia el rendimiento con un hiperparámetro.</li><li><strong>Brecha train-test:</strong> si train va arriba y test va abajo → overfitting. Si los dos van mal → underfitting.</li><li><strong>Punto dulce:</strong> profundidad donde test alcanza su máximo antes de que el modelo empiece a memorizar.</li></ul></div>
+</section><section class="cell" id="cell-15">
+<div class="cell-head">
+<span class="num">Celda 15</span>
+<span class="tag type-md">MARKDOWN</span>
+<h3>Sección VII — Visualizaciones</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Anuncia que vienen los gráficos: ROC, matrices de confusión y barras comparativas.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Hora de los gráficos para que entiendas cómo le fue al modelo.</div>
+</section><section class="cell" id="cell-16">
+<div class="cell-head">
+<span class="num">Celda 16</span>
+<span class="tag type-code">CÓDIGO</span>
+<h3>CELDA 8 — Curvas ROC comparativas</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Dibuja una curva ROC por cada split. Cuanto más "arriba a la izquierda" pase la curva, mejor es el modelo.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> La curva ROC mide qué tan bueno es el modelo separando aprobados de reprobados. La diagonal punteada es lo que conseguirías tirando una moneda. Tu modelo debería estar bien por encima.</div>
+<div class="concepts"><strong>💡 Conceptos clave:</strong><ul><li><strong>FPR (eje X):</strong> tasa de falsos positivos. <em>¿A cuántos reprobados etiqueté mal como aprobados?</em></li><li><strong>TPR / Recall (eje Y):</strong> tasa de verdaderos positivos. <em>¿A cuántos aprobados detecté correctamente?</em></li><li><strong>AUC:</strong> área bajo la curva ROC. 0.5 = aleatorio, 1.0 = perfecto. 0.8+ se considera bueno.</li></ul></div>
+</section><section class="cell" id="cell-17">
+<div class="cell-head">
+<span class="num">Celda 17</span>
+<span class="tag type-code">CÓDIGO</span>
+<h3>CELDA 9 — Matrices de confusión (3 splits)</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Dibuja 3 matrices 2×2 mostrando aciertos y errores por clase.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Una tabla 2×2 que dice: <em>"de los que dijiste APROBADOS, X realmente aprobaron y Y reprobaron"</em> y viceversa. Las diagonales son aciertos, las otras casillas son errores.</div>
+<div class="concepts"><strong>💡 Conceptos clave:</strong><ul><li><strong>Verdadero positivo (TP):</strong> predije aprobado y sí aprobó.</li><li><strong>Verdadero negativo (TN):</strong> predije reprobado y sí reprobó.</li><li><strong>Falso positivo (FP):</strong> predije aprobado pero reprobó.</li><li><strong>Falso negativo (FN):</strong> predije reprobado pero aprobó.</li></ul></div>
+</section><section class="cell" id="cell-18">
+<div class="cell-head">
+<span class="num">Celda 18</span>
+<span class="tag type-code">CÓDIGO</span>
+<h3>CELDA 10 — Gráfico de barras de las 5 métricas</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Compara visualmente las 5 métricas entre los 3 splits en un mismo gráfico de barras agrupadas.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Resumen visual: te dice de un vistazo qué split ganó en cada métrica.</div>
+</section><section class="cell" id="cell-19">
+<div class="cell-head">
+<span class="num">Celda 19</span>
+<span class="tag type-md">MARKDOWN</span>
+<h3>Sección VIII — Importancia de variables (Feature Importance)</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Anuncia que vamos a ver qué variables influyeron más en las decisiones del árbol.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Hora de descubrir qué fue lo que más importó para predecir: ¿las horas? ¿la asistencia? ¿la institución?</div>
+</section><section class="cell" id="cell-20">
+<div class="cell-head">
+<span class="num">Celda 20</span>
+<span class="tag type-code">CÓDIGO</span>
+<h3>CELDA 11 — Gráfico de Feature Importance Gini</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Saca la importancia de cada feature (cuánto reduce la impureza Gini en promedio) del modelo Split 80/20 y la grafica como barras horizontales ordenadas.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> El árbol revela su "secreto": qué variable usó más para tomar decisiones. La feature con la barra más larga es la que más influye en la predicción.</div>
+<div class="concepts"><strong>💡 Conceptos clave:</strong><ul><li><strong>feature_importances_:</strong> atributo del modelo entrenado que tiene un valor por feature.</li><li><strong>Reducción de impureza:</strong> cuánto "limpia" cada feature los nodos al dividir.</li><li><strong>Suma = 1.0:</strong> las importancias están normalizadas. Si una vale 0.6, contribuye al 60% de las decisiones.</li></ul></div>
+</section><section class="cell" id="cell-21">
+<div class="cell-head">
+<span class="num">Celda 21</span>
+<span class="tag type-md">MARKDOWN</span>
+<h3>Sección IX — Tabla final de métricas</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Anuncia la presentación final con formato bonito.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> El boletín final, decorado con colores para que sea más fácil de leer.</div>
+</section><section class="cell" id="cell-22">
+<div class="cell-head">
+<span class="num">Celda 22</span>
+<span class="tag type-code">CÓDIGO</span>
+<h3>CELDA 12 — DataFrame resumen con formato</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Construye la tabla final con las métricas y aplica un degradado de color verde donde mayor valor = más oscuro.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Mismo boletín pero con código de colores: lo más verde es lo mejor. Visualmente más amable.</div>
+</section><section class="cell" id="cell-23">
+<div class="cell-head">
+<span class="num">Celda 23</span>
+<span class="tag type-md">MARKDOWN</span>
+<h3>Sección X — Conclusiones</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Resume hallazgos, compara con regresión logística, y sugiere próximos pasos: usar el max_depth óptimo encontrado, probar Random Forest, validación cruzada.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> El cierre del documento. Lecciones aprendidas y "qué probar ahora".</div>
+</section>
+
+<section class="glosario">
+<h2>📖 Glosario rápido</h2>
+<dl>
+<dt>Clasificación binaria</dt><dd>Tarea de predecir entre dos categorías (sí/no, 1/0). Aquí: aprobar o no aprobar.</dd>
+<dt>Árbol CART</dt><dd>Classification And Regression Trees. Tipo de árbol que usa scikit-learn por defecto, basado en impureza Gini para clasificación.</dd>
+<dt>Impureza Gini</dt><dd>Medida de qué tan mezcladas están las clases en un nodo. Mínimo (0) = todas iguales; máximo (0.5 en binario) = mitad y mitad.</dd>
+<dt>Accuracy</dt><dd>Porcentaje de aciertos totales. (TP + TN) / Total. Engañosa con datos desbalanceados.</dd>
+<dt>Precision</dt><dd>De los que predije positivos, cuántos lo eran de verdad. TP / (TP + FP). Importante cuando los falsos positivos son costosos.</dd>
+<dt>Recall (Sensibilidad)</dt><dd>De los positivos reales, cuántos detecté. TP / (TP + FN). Importante cuando perder un positivo es caro (ej. cáncer).</dd>
+<dt>F1-Score</dt><dd>Promedio armónico de precision y recall. Útil cuando hay desbalance entre clases.</dd>
+<dt>ROC-AUC</dt><dd>Área bajo la curva ROC. Mide qué tan bien el modelo separa las clases sin importar el umbral. 0.5 = aleatorio, 1.0 = perfecto.</dd>
+<dt>Matriz de confusión</dt><dd>Tabla 2×2 que cuenta los aciertos y errores por clase (TP, TN, FP, FN).</dd>
+<dt>One-hot encoding</dt><dd>Convertir una variable categórica de N categorías en N columnas binarias 0/1.</dd>
+<dt>Data leakage</dt><dd>Cuando filtras información del objetivo en las features. Produce métricas falsamente buenas.</dd>
+<dt>Stratify</dt><dd>Mantener la misma proporción de clases en train y test durante el split. Esencial con datos desbalanceados.</dd>
+<dt>class_weight=&#x27;balanced&#x27;</dt><dd>Parámetro que hace que el modelo dé más peso a la clase minoritaria para compensar el desbalance.</dd>
+<dt>Feature importance</dt><dd>Qué tanto contribuyó cada variable a las decisiones del árbol. Suma 1.0 en árboles de sklearn.</dd>
+<dt>Hiperparámetro max_depth</dt><dd>Profundidad máxima del árbol. Pequeño = simple (puede underfit); grande = complejo (puede overfit).</dd>
+</dl>
+</section>
+
+<footer class="foot">
+Generado para acompañar el notebook. Si una celda dice "no entiendo nada", relee la sección
+🧒 <em>Para dummies</em> — está pensada justo para eso.
+</footer>
+
+</div>
+</body>
+</html>

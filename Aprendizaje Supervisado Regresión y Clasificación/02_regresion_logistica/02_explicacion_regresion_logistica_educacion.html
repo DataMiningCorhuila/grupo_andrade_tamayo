@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guía didáctica — regresion_logistica_educacion.ipynb</title>
+<style>
+:root {
+    --bg: #f7f8fc;
+    --bg-card: #ffffff;
+    --primary: #4F46E5;
+    --primary-soft: #EEF2FF;
+    --accent: #10B981;
+    --warn: #F59E0B;
+    --danger: #EF4444;
+    --ink: #1F2937;
+    --muted: #6B7280;
+    --line: #E5E7EB;
+    --code-bg: #0F172A;
+    --code-ink: #E2E8F0;
+    --shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+}
+* { box-sizing: border-box; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.65;
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+}
+.wrap {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 32px 24px 80px;
+}
+header.hero {
+    background: linear-gradient(135deg, #0EA5E9 0%, #4F46E5 100%);
+    color: #fff;
+    padding: 48px 32px;
+    border-radius: 18px;
+    margin-bottom: 28px;
+    box-shadow: var(--shadow);
+}
+header.hero h1 {
+    margin: 0 0 12px 0;
+    font-size: 30px;
+    line-height: 1.2;
+}
+header.hero p {
+    margin: 6px 0;
+    opacity: 0.92;
+    font-size: 16px;
+}
+header.hero .badges {
+    display: flex;
+    gap: 8px;
+    margin-top: 18px;
+    flex-wrap: wrap;
+}
+header.hero .badges span {
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.25);
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+}
+.toc {
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 28px;
+    box-shadow: var(--shadow);
+}
+.toc h2 {
+    margin: 0 0 12px 0;
+    font-size: 16px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+.toc ol {
+    columns: 2;
+    column-gap: 28px;
+    padding-left: 20px;
+    margin: 0;
+    font-size: 14px;
+}
+.toc ol li { margin-bottom: 4px; }
+.toc a { color: var(--ink); text-decoration: none; }
+.toc a:hover { color: var(--primary); }
+
+.section-title {
+    margin: 40px 0 18px 0;
+    font-size: 22px;
+    color: var(--ink);
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--primary-soft);
+}
+
+.cell {
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 22px 26px;
+    margin-bottom: 22px;
+    box-shadow: var(--shadow);
+}
+.cell-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+}
+.cell-head .num {
+    background: var(--primary);
+    color: white;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 3px 10px;
+    border-radius: 8px;
+}
+.cell-head .type-md   { background: #DBEAFE; color: #1E40AF; }
+.cell-head .type-code { background: #DCFCE7; color: #166534; }
+.cell-head .tag {
+    font-size: 12px;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+.cell-head h3 {
+    margin: 0;
+    font-size: 17px;
+    flex: 1;
+    min-width: 250px;
+}
+
+.what {
+    background: var(--primary-soft);
+    border-left: 4px solid var(--primary);
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin: 12px 0;
+}
+.what strong { color: var(--primary); }
+
+.dummies {
+    background: #FFF7ED;
+    border-left: 4px solid #F97316;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin: 12px 0;
+}
+.dummies strong { color: #C2410C; }
+
+.concepts {
+    background: #F0FDF4;
+    border-left: 4px solid var(--accent);
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin: 12px 0;
+}
+.concepts strong { color: #065F46; }
+.concepts ul { margin: 6px 0 0 0; padding-left: 22px; }
+.concepts li { margin-bottom: 4px; }
+
+.warn {
+    background: #FEF3C7;
+    border-left: 4px solid var(--warn);
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin: 12px 0;
+}
+.warn strong { color: #92400E; }
+
+pre.code {
+    background: var(--code-bg);
+    color: var(--code-ink);
+    padding: 14px 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.55;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    margin: 12px 0;
+}
+code.inline {
+    background: #F1F5F9;
+    color: #0F172A;
+    padding: 2px 6px;
+    border-radius: 5px;
+    font-size: 13px;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+}
+
+.formula {
+    background: #F8FAFC;
+    border: 1px dashed var(--line);
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin: 12px 0;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 14.5px;
+    text-align: center;
+    color: var(--ink);
+}
+
+.glosario {
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 24px;
+    margin-top: 32px;
+    box-shadow: var(--shadow);
+}
+.glosario h2 {
+    margin: 0 0 16px 0;
+    color: var(--primary);
+}
+.glosario dl { margin: 0; }
+.glosario dt {
+    font-weight: 700;
+    color: var(--ink);
+    margin-top: 14px;
+}
+.glosario dd {
+    margin: 4px 0 0 0;
+    color: var(--muted);
+    font-size: 14.5px;
+}
+
+table.tabla {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 14px;
+}
+table.tabla th, table.tabla td {
+    text-align: left;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--line);
+}
+table.tabla th {
+    background: #F8FAFC;
+    color: var(--muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+}
+
+footer.foot {
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    margin-top: 40px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+}
+
+@media (max-width: 640px) {
+    .toc ol { columns: 1; }
+    header.hero { padding: 32px 22px; }
+    header.hero h1 { font-size: 23px; }
+    .wrap { padding: 20px 14px 60px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+<h1>Guía didáctica — regresion_logistica_educacion.ipynb</h1>
+<p>Explicación celda por celda del notebook de Regresión Logística Binaria para predecir aprobación académica.</p>
+<div class="badges"><span>Regresión Logística</span><span>Clasificación binaria</span><span>aprobado (grade ≥ 3.0)</span><span>3 splits</span><span>Para principiantes</span></div>
+</header>
+
+<section class="cell">
+<h2 style="margin-top:0;color:var(--primary);">📚 ¿De qué va este documento?</h2>
+<p>Este documento acompaña el notebook <strong>regresion_logistica_educacion.ipynb</strong>. Cada celda tiene aquí una explicación clara, con conceptos clave y notas para principiantes.</p>
+<p>El notebook entrena un modelo de <strong>regresión logística binaria</strong> que predice si un estudiante aprobará o no la asignatura. A diferencia del árbol de decisión, este modelo asume una relación lineal entre las variables y el log-odds — y por eso <strong>sí requiere escalado</strong> (<code class='inline'>StandardScaler</code>).</p>
+<p>El gran valor agregado de la regresión logística es la <strong>interpretabilidad</strong>: cada coeficiente β tiene un significado claro vía Odds Ratios.</p>
+<p>Al final encontrarás un <strong>glosario rápido</strong> con todos los términos técnicos.</p>
+</section>
+
+
+<section class="cell">
+<h2 style="margin-top:0;color:var(--primary);">🎯 Antes de empezar: ¿qué es la regresión logística?</h2>
+
+<div class="dummies"><strong>🧒 Versión rápida:</strong>
+Es como la regresión lineal, pero en vez de predecir un <em>número cualquiera</em>, predice una
+<em>probabilidad entre 0 y 1</em>. Si la probabilidad es mayor que 0.5, decimos "sí" (clase 1); si no, "no" (clase 0).
+</div>
+
+<div class="what"><strong>📌 La idea técnica:</strong>
+La regresión lineal predice <code class="inline">y = β₀ + β₁x₁ + β₂x₂ + …</code>, que puede dar cualquier número (negativo,
+gigante, lo que sea). Como queremos una probabilidad, ese resultado se mete en una función llamada
+<strong>sigmoide</strong> que lo aplasta entre 0 y 1.
+</div>
+
+<div class="formula">
+P(aprobar = 1) = sigmoide(β₀ + β₁·hours + β₂·sleep + …) = 1 / (1 + e<sup>−(β₀ + β₁x₁ + …)</sup>)
+</div>
+
+<table class="tabla">
+<tr><th>Concepto</th><th>Regresión lineal</th><th>Regresión logística</th></tr>
+<tr><td>Predice</td><td>Un número continuo (ej. la nota)</td><td>Una probabilidad ∈ [0, 1]</td></tr>
+<tr><td>Función</td><td>Recta / hiperplano</td><td>Curva en S (sigmoide)</td></tr>
+<tr><td>Salida</td><td>ŷ ∈ ℝ</td><td>ŷ ∈ {0, 1} (tras umbralear)</td></tr>
+<tr><td>Métricas</td><td>R², RMSE, MAE</td><td>Accuracy, Precision, Recall, F1, AUC</td></tr>
+<tr><td>Asume</td><td>Relación lineal entre X e Y</td><td>Relación lineal entre X y el log-odds</td></tr>
+</table>
+
+<div class="concepts"><strong>💡 Tres palabras que aparecerán mucho:</strong>
+<ul>
+<li><strong>Probabilidad:</strong> número entre 0 y 1 que dice "qué tan seguro estoy de que es clase 1".</li>
+<li><strong>Odds (cuotas):</strong> probabilidad de éxito dividida por la de fracaso. <code class="inline">odds = p / (1−p)</code>.
+Si p=0.75, las odds son 3 (3 a 1 a favor).</li>
+<li><strong>Odds Ratio:</strong> <code class="inline">exp(β)</code>. Te dice cuántas veces se multiplican las odds por cada
+unidad de incremento en la variable.</li>
+</ul>
+</div>
+</section>
+
+
+<nav class="toc">
+<h2>📑 Índice de celdas</h2>
+<ol>
+<li><a href="#cell-1">Celda 1 — Título y resumen del notebook</a></li>
+<li><a href="#cell-2">Celda 2 — Sección I — Configuración inicial</a></li>
+<li><a href="#cell-3">Celda 3 — CELDA 1 — Importaciones y bootstrap del path</a></li>
+<li><a href="#cell-4">Celda 4 — Sección II — Extracción de datos</a></li>
+<li><a href="#cell-5">Celda 5 — CELDA 2 — Query SQL con CASE WHEN para crear el target</a></li>
+<li><a href="#cell-6">Celda 6 — CELDA 3 — Validación y exploración</a></li>
+<li><a href="#cell-7">Celda 7 — Sección III — Preprocesamiento</a></li>
+<li><a href="#cell-8">Celda 8 — CELDA 4 — Preprocesamiento completo (con escalado)</a></li>
+<li><a href="#cell-9">Celda 9 — Sección IV — Entrenamiento con tres splits</a></li>
+<li><a href="#cell-10">Celda 10 — CELDA 5 — Función entrenar_evaluar()</a></li>
+<li><a href="#cell-11">Celda 11 — CELDA 6 — Ejecutar los 3 splits y mostrar tabla</a></li>
+<li><a href="#cell-12">Celda 12 — Sección V — Visualizaciones</a></li>
+<li><a href="#cell-13">Celda 13 — CELDA 7 — Curvas ROC comparativas</a></li>
+<li><a href="#cell-14">Celda 14 — CELDA 8 — Matrices de confusión por split</a></li>
+<li><a href="#cell-15">Celda 15 — CELDA 9 — Gráfico comparativo de barras (5 métricas × 3 splits)</a></li>
+<li><a href="#cell-16">Celda 16 — CELDA 10 — Coeficientes y Odds Ratios</a></li>
+<li><a href="#cell-17">Celda 17 — Sección VI — Tabla final y conclusiones</a></li>
+<li><a href="#cell-18">Celda 18 — CELDA 11 — DataFrame resumen con estilo</a></li>
+<li><a href="#cell-19">Celda 19 — Conclusiones finales</a></li>
+</ol>
+</nav>
+
+<h2 class="section-title">🔍 Explicación celda por celda</h2>
+<section class="cell" id="cell-1">
+<div class="cell-head">
+<span class="num">Celda 1</span>
+<span class="tag type-md">MARKDOWN</span>
+<h3>Título y resumen del notebook</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Es la portada. Anuncia que vamos a usar <strong>regresión logística binaria</strong> para predecir si un estudiante aprobará la asignatura (<code class='inline'>aprobado = 1</code> si <code class='inline'>grade ≥ 3.0</code>).</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Igual que el árbol de clasificación: queremos contestar la pregunta <em>"¿este estudiante va a aprobar?"</em> con un Sí o un No. Pero esta vez usamos otro modelo (regresión logística) que es un clásico de toda la vida.</div>
+<div class="concepts"><strong>💡 Conceptos clave:</strong><ul><li><strong>Regresión logística:</strong> modelo que predice una <em>probabilidad</em> de pertenecer a una clase.</li><li><strong>Binaria:</strong> solo hay dos clases posibles (1 ó 0, sí o no).</li><li><strong>Umbral 0.5:</strong> si la probabilidad predicha es > 0.5, asignamos clase 1.</li></ul></div>
+</section><section class="cell" id="cell-2">
+<div class="cell-head">
+<span class="num">Celda 2</span>
+<span class="tag type-md">MARKDOWN</span>
+<h3>Sección I — Configuración inicial</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Separador. Anuncia que vienen las importaciones.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Capítulo del libro: "Capítulo I — Preparativos".</div>
+</section><section class="cell" id="cell-3">
+<div class="cell-head">
+<span class="num">Celda 3</span>
+<span class="tag type-code">CÓDIGO</span>
+<h3>CELDA 1 — Importaciones y bootstrap del path</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Carga las librerías y conecta con la base de datos del subproyecto <code class='inline'>educacion</code>. Define también la carpeta donde se guardarán las gráficas.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Sacamos los utensilios del cajón y le decimos a Python <em>"el archivo de conexión a la base de datos está en aquella otra carpeta"</em>.</div>
+<div class="concepts"><strong>💡 Conceptos clave:</strong><ul><li><strong>LogisticRegression:</strong> el modelo de regresión logística de sklearn.</li><li><strong>StandardScaler:</strong> herramienta para escalar variables (media=0, desv=1). <strong>Sí lo usamos aquí</strong> (a diferencia de los árboles).</li><li><strong>Métricas importadas:</strong> accuracy, precision, recall, f1, roc_auc — las 5 estrellas de clasificación.</li><li><strong>confusion_matrix:</strong> herramienta para dibujar la tabla 2×2 de aciertos/errores.</li></ul></div>
+<pre class="code">from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score</pre>
+</section><section class="cell" id="cell-4">
+<div class="cell-head">
+<span class="num">Celda 4</span>
+<span class="tag type-md">MARKDOWN</span>
+<h3>Sección II — Extracción de datos</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Anuncia la carga de datos desde PostgreSQL.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Vamos a sacar los datos de la nevera (PostgreSQL).</div>
+</section><section class="cell" id="cell-5">
+<div class="cell-head">
+<span class="num">Celda 5</span>
+<span class="tag type-code">CÓDIGO</span>
+<h3>CELDA 2 — Query SQL con CASE WHEN para crear el target</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Hace JOIN entre <code class='inline'>registros_estudiantes</code> e <code class='inline'>instituciones</code>, y crea la columna binaria <code class='inline'>aprobado</code> directamente en SQL: <code class='inline'>CASE WHEN grade >= 3.0 THEN 1 ELSE 0 END</code>. Después imprime el balance de clases y la distribución por institución.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Le pedimos al motor de la base de datos: <em>"tráeme los datos, y de paso ponme una columna nueva que diga 1 si la nota es 3 o más, y 0 si es menor"</em>. Más rápido que hacerlo en Python después.</div>
+<div class="concepts"><strong>💡 Conceptos clave:</strong><ul><li><strong>CASE WHEN:</strong> el if/else de SQL.</li><li><strong>Balance de clases:</strong> proporción de 1's vs 0's. Si está muy desbalanceada, hay que tratarla.</li><li><strong>text():</strong> envoltorio de SQLAlchemy 2.0 para evitar warnings de seguridad.</li></ul></div>
+</section><section class="cell" id="cell-6">
+<div class="cell-head">
+<span class="num">Celda 6</span>
+<span class="tag type-code">CÓDIGO</span>
+<h3>CELDA 3 — Validación y exploración</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Muestra tipos de datos, valores nulos, balance del target y promedios de las features por clase (aprobados vs reprobados).</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Inspeccionamos los datos antes de cocinar. Comparar promedios entre aprobados y reprobados ya nos da pistas: probablemente los aprobados estudian más horas y tienen mejor asistencia.</div>
+<div class="concepts"><strong>💡 Conceptos clave:</strong><ul><li><strong>groupby('aprobado').mean():</strong> calcula promedios separados por clase. Muy útil para ver qué variables son distintas entre grupos.</li></ul></div>
+</section><section class="cell" id="cell-7">
+<div class="cell-head">
+<span class="num">Celda 7</span>
+<span class="tag type-md">MARKDOWN</span>
+<h3>Sección III — Preprocesamiento</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Anuncia los pasos para preparar los datos: features de fecha, nulos, OHE y escalado.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Hora de lavar y picar los ingredientes.</div>
+</section><section class="cell" id="cell-8">
+<div class="cell-head">
+<span class="num">Celda 8</span>
+<span class="tag type-code">CÓDIGO</span>
+<h3>CELDA 4 — Preprocesamiento completo (con escalado)</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Extrae <code class='inline'>mes</code> y <code class='inline'>dia_semana</code> de la fecha, rellena nulos con la mediana, hace one-hot encoding de <code class='inline'>institucion</code>, y aplica <code class='inline'>StandardScaler</code> a las 6 variables numéricas. <strong>Excluye <code class='inline'>grade</code></strong> del modelo para evitar data leakage.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Acá está el paso clave que diferencia esto del árbol: <strong>escalamos las variables</strong>. Es como pasar todo a la misma "escala" (de −3 a 3 aprox.). Sin esto, los coeficientes serían imposibles de comparar y el solver podría no converger.</div>
+<div class="concepts"><strong>💡 Conceptos clave:</strong><ul><li><strong>StandardScaler:</strong> transforma cada columna a <code class='inline'>(x − media) / desv_estandar</code>. Resultado: media≈0, desv≈1.</li><li><strong>¿Por qué escalar?</strong> Porque la regresión logística usa coeficientes lineales y es sensible a la escala. Una variable que va de 0 a 100 "opacaría" a una que va de 0 a 5.</li><li><strong>¿Por qué los árboles NO necesitan escalado?</strong> Porque dividen en umbrales (<em>"si hours > 4"</em>). Da igual que hours esté de 0-10 o de 0-1000, el umbral se ajusta solo.</li><li><strong>One-hot encoding con drop_first=True:</strong> evita multicolinealidad (si tienes 5 instituciones, basta con 4 columnas: la quinta se deduce).</li></ul></div>
+<div class="warn"><strong>⚠️ Ojo aquí:</strong> Si dejaras <code class='inline'>grade</code> en X, el modelo aprendería literalmente <em>"si grade ≥ 3.0 entonces aprobado=1"</em> con accuracy 100%. Eso es trampa: en producción no tienes <code class='inline'>grade</code> antes de calcular si aprueba.</div>
+</section><section class="cell" id="cell-9">
+<div class="cell-head">
+<span class="num">Celda 9</span>
+<span class="tag type-md">MARKDOWN</span>
+<h3>Sección IV — Entrenamiento con tres splits</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Anuncia que se entrenarán 3 modelos con distintas proporciones train/test.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Mismo enfoque que en los árboles: tres exámenes con distintos pesos para asegurarnos de que el modelo es estable.</div>
+</section><section class="cell" id="cell-10">
+<div class="cell-head">
+<span class="num">Celda 10</span>
+<span class="tag type-code">CÓDIGO</span>
+<h3>CELDA 5 — Función entrenar_evaluar()</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Define la función reutilizable. Hace train/test split estratificado, entrena el modelo logístico con <code class='inline'>class_weight='balanced'</code> y <code class='inline'>max_iter=1000</code>, predice clases y probabilidades, y calcula las 5 métricas + datos para ROC y matriz de confusión.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Otra vez el "botón mágico", pero esta vez es para regresión logística. Toda la lógica encapsulada en una función para reusarla 3 veces.</div>
+<div class="concepts"><strong>💡 Conceptos clave:</strong><ul><li><strong>predict_proba()[:, 1]:</strong> devuelve la probabilidad de que la muestra pertenezca a la clase 1 (aprobado). Indispensable para curva ROC.</li><li><strong>predict():</strong> devuelve directamente 0 ó 1 aplicando el umbral 0.5 a las probabilidades.</li><li><strong>max_iter=1000:</strong> el solver iterativo (lbfgs) hace hasta 1000 iteraciones para converger. Sin esto, podrías ver un warning <em>"failed to converge"</em>.</li><li><strong>class_weight='balanced':</strong> da más peso a la clase minoritaria automáticamente.</li><li><strong>stratify=y:</strong> mantiene la proporción 50/50 (aprobados/reprobados) tanto en train como en test.</li></ul></div>
+</section><section class="cell" id="cell-11">
+<div class="cell-head">
+<span class="num">Celda 11</span>
+<span class="tag type-code">CÓDIGO</span>
+<h3>CELDA 6 — Ejecutar los 3 splits y mostrar tabla</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Llama a la función con los 3 splits (80/20, 60/40, 70/30) y muestra una tabla en consola con las 5 métricas para cada uno.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Aprieta el botón mágico 3 veces con distintas proporciones. Te devuelve un boletín comparativo.</div>
+<div class="concepts"><strong>💡 Conceptos clave:</strong><ul><li><strong>El orden 80/20 → 60/40 → 70/30:</strong> es la convención del proyecto, no afecta los resultados.</li></ul></div>
+</section><section class="cell" id="cell-12">
+<div class="cell-head">
+<span class="num">Celda 12</span>
+<span class="tag type-md">MARKDOWN</span>
+<h3>Sección V — Visualizaciones</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Anuncia los 4 gráficos que vienen: ROC, matrices de confusión, barras y coeficientes.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Hora de los gráficos para entender visualmente cómo va el modelo.</div>
+</section><section class="cell" id="cell-13">
+<div class="cell-head">
+<span class="num">Celda 13</span>
+<span class="tag type-code">CÓDIGO</span>
+<h3>CELDA 7 — Curvas ROC comparativas</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Dibuja una curva ROC por cada split sobre el mismo plano. Cuanto más "arriba a la izquierda" pase la curva, mejor.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> La curva ROC dice: <em>"a medida que el modelo se vuelve más permisivo (acepta más positivos), ¿cuántos aciertos y errores comete?"</em>. La curva ideal sube derecho hacia el (0,1).</div>
+<div class="concepts"><strong>💡 Conceptos clave:</strong><ul><li><strong>FPR (x):</strong> tasa de falsos positivos.</li><li><strong>TPR (y) = Recall:</strong> tasa de verdaderos positivos.</li><li><strong>AUC:</strong> área bajo la curva. 0.5 = aleatorio; 0.7-0.8 = aceptable; 0.8-0.9 = bueno; >0.9 = excelente.</li><li><strong>Diagonal punteada:</strong> referencia del clasificador aleatorio (AUC=0.5).</li></ul></div>
+</section><section class="cell" id="cell-14">
+<div class="cell-head">
+<span class="num">Celda 14</span>
+<span class="tag type-code">CÓDIGO</span>
+<h3>CELDA 8 — Matrices de confusión por split</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Dibuja 3 matrices 2×2 mostrando TP, TN, FP y FN para cada split.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Tabla de 2×2: en diagonal van los aciertos, fuera de diagonal los errores. <em>"De los que dije que aprobaban, ¿cuántos sí aprobaron?"</em>.</div>
+<div class="concepts"><strong>💡 Conceptos clave:</strong><ul><li><strong>TP (verdadero positivo):</strong> predije aprobado y sí aprobó.</li><li><strong>TN (verdadero negativo):</strong> predije reprobado y sí reprobó.</li><li><strong>FP (falso positivo):</strong> predije aprobado pero reprobó.</li><li><strong>FN (falso negativo):</strong> predije reprobado pero aprobó.</li></ul></div>
+</section><section class="cell" id="cell-15">
+<div class="cell-head">
+<span class="num">Celda 15</span>
+<span class="tag type-code">CÓDIGO</span>
+<h3>CELDA 9 — Gráfico comparativo de barras (5 métricas × 3 splits)</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Compara las 5 métricas entre los 3 splits con barras agrupadas etiquetadas. Te dice de un vistazo qué split ganó.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Resumen visual: 15 barras (5 métricas × 3 splits) lado a lado. Más fácil que leer números en una tabla.</div>
+</section><section class="cell" id="cell-16">
+<div class="cell-head">
+<span class="num">Celda 16</span>
+<span class="tag type-code">CÓDIGO</span>
+<h3>CELDA 10 — Coeficientes y Odds Ratios</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Saca los coeficientes β del modelo Split 80/20, los grafica como barras horizontales (azul=positivo, rojo=negativo) y construye una tabla con <code class='inline'>exp(β)</code> = Odds Ratio.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Esta es la celda más útil para el negocio: te dice <strong>qué variable importa más y en qué sentido</strong>. Si <code class='inline'>hours</code> tiene β=+1.87, significa que estudiar más HORAS aumenta MUCHO la probabilidad de aprobar (6.48 veces las odds por cada desviación estándar).</div>
+<div class="formula">Odds Ratio = exp(β)  &nbsp;&nbsp;|&nbsp;&nbsp;  P(aprobar) = sigmoide(β₀ + Σ βᵢ·xᵢ)</div>
+<div class="concepts"><strong>💡 Conceptos clave:</strong><ul><li><strong>β positivo:</strong> aumenta la probabilidad de aprobar. (Esperamos esto para hours, sleep, attendance.)</li><li><strong>β negativo:</strong> disminuye la probabilidad de aprobar. (Esperamos esto para screen.)</li><li><strong>Magnitud de β:</strong> qué tan fuerte es el efecto. Como escalamos las variables, son comparables entre sí.</li><li><strong>Odds Ratio = exp(β):</strong> cuántas veces se multiplican las odds por cada unidad estandarizada de incremento.</li><li><strong>OR = 1:</strong> sin efecto. <strong>OR > 1:</strong> efecto positivo. <strong>OR < 1:</strong> efecto negativo.</li></ul></div>
+</section><section class="cell" id="cell-17">
+<div class="cell-head">
+<span class="num">Celda 17</span>
+<span class="tag type-md">MARKDOWN</span>
+<h3>Sección VI — Tabla final y conclusiones</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Anuncia la presentación final estilizada.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> El boletín final con colorcitos.</div>
+</section><section class="cell" id="cell-18">
+<div class="cell-head">
+<span class="num">Celda 18</span>
+<span class="tag type-code">CÓDIGO</span>
+<h3>CELDA 11 — DataFrame resumen con estilo</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Imprime la tabla final formateada con un degradado de color verde donde mayor valor = más oscuro.</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> Mismo boletín pero más bonito. Lo verde oscuro es lo mejor.</div>
+</section><section class="cell" id="cell-19">
+<div class="cell-head">
+<span class="num">Celda 19</span>
+<span class="tag type-md">MARKDOWN</span>
+<h3>Conclusiones finales</h3>
+</div>
+<div class="what"><strong>📌 Qué hace:</strong> Resume hallazgos, compara con árboles CART y sugiere próximos pasos (ajustar umbral, validación cruzada, regularización L1/L2).</div>
+<div class="dummies"><strong>🧒 Para dummies:</strong> El cierre. Si tienes que elegir entre logística y árbol, lee esta tabla — te dice las ventajas y desventajas de cada uno.</div>
+</section>
+
+<section class="glosario">
+<h2>📖 Glosario rápido</h2>
+<dl>
+<dt>Regresión logística</dt><dd>Modelo de clasificación que predice una probabilidad ∈ [0, 1] usando la función sigmoide aplicada a una combinación lineal de las features.</dd>
+<dt>Función sigmoide</dt><dd>Función matemática en forma de S que mapea cualquier número real a un valor entre 0 y 1. Fórmula: 1 / (1 + e⁻ˣ).</dd>
+<dt>Log-odds (logit)</dt><dd>Logaritmo de las odds: log(p / (1−p)). La regresión logística asume que log-odds es lineal en las features.</dd>
+<dt>Odds</dt><dd>Probabilidad de éxito sobre probabilidad de fracaso. Si p=0.75, odds=3 (3 a 1 a favor).</dd>
+<dt>Odds Ratio</dt><dd>exp(β). Cuántas veces se multiplican las odds por cada unidad de incremento estandarizado en la variable.</dd>
+<dt>Coeficiente β</dt><dd>Peso que el modelo asigna a cada variable. Positivo = aumenta probabilidad; negativo = la disminuye. Su magnitud (con datos escalados) indica importancia.</dd>
+<dt>Umbral de decisión</dt><dd>Probabilidad a partir de la cual asignamos clase 1. Por defecto 0.5, pero se puede ajustar (bajar para detectar más positivos, subir para más precisión).</dd>
+<dt>StandardScaler</dt><dd>Transformador de sklearn que estandariza cada variable: x' = (x − media) / desv_estándar. Resultado: media≈0, desv≈1.</dd>
+<dt>max_iter</dt><dd>Número máximo de iteraciones del solver para encontrar los coeficientes óptimos. 1000 suele ser suficiente.</dd>
+<dt>class_weight=&#x27;balanced&#x27;</dt><dd>Le dice al modelo que dé más peso a la clase minoritaria. Compensa el desbalance entre 0's y 1's.</dd>
+<dt>predict_proba</dt><dd>Devuelve probabilidades de cada clase. predict_proba(X)[:, 1] es la probabilidad de clase 1.</dd>
+<dt>Stratified split</dt><dd>Train/test split que mantiene la misma proporción de clases en ambos conjuntos. Crítico con datos desbalanceados.</dd>
+<dt>ROC-AUC</dt><dd>Área bajo la curva ROC. Mide la capacidad del modelo de distinguir clases sin importar el umbral. 0.5 aleatorio, 1.0 perfecto.</dd>
+<dt>Matriz de confusión</dt><dd>Tabla 2×2 con TP, TN, FP, FN. Base para calcular todas las demás métricas.</dd>
+<dt>Data leakage</dt><dd>Cuando una feature contiene información del objetivo. Aquí lo evitamos excluyendo grade del modelo.</dd>
+<dt>Regularización L1/L2</dt><dd>Técnicas para penalizar coeficientes grandes y evitar overfitting. L1 (Lasso) pone coeficientes en cero (selección de variables); L2 (Ridge) los encoge.</dd>
+</dl>
+</section>
+
+<footer class="foot">
+Generado para acompañar el notebook. Si una celda dice "no entiendo nada", relee la sección
+🧒 <em>Para dummies</em> — está pensada justo para eso.
+</footer>
+
+</div>
+</body>
+</html>
